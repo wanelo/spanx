@@ -2,10 +2,10 @@
 require File.expand_path('../lib/ip-blocker/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["Konstantin Gredeskoul"]
-  gem.email         = ["kigster@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.authors       = ["Konstantin Gredeskoul","Eric Saxby"]
+  gem.email         = ["kigster@gmail.com", "sax@livinginthepast.org"]
+  gem.description   = %q{Real time IP parsing and rate detection gem for access_log files}
+  gem.summary       = %q{Real time IP parsing and rate detection gem for access_log files}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
@@ -13,5 +13,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "ip-blocker"
   gem.require_paths = ["lib"]
-  gem.version       = Ip::Blocker::VERSION
+  gem.version       = IPBlocker::VERSION
+
+  gem.add_dependency "file-tail"
 end

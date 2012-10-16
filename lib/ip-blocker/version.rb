@@ -1,5 +1,3 @@
-module Ip
-  module Blocker
-    VERSION = "0.0.1"
-  end
+module IPBlocker
+  VERSION = "0.0.1"
 end
