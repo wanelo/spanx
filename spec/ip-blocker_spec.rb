@@ -8,6 +8,7 @@ describe "ip blocker" do
 
   before do
     @file_name = "spec/fixtures/access.log.1"
+    @read_timeout = 0.01
   end
 
   it "should be able to read and parse IPs from a static file" do
@@ -16,7 +17,7 @@ describe "ip blocker" do
     reader = IPBlocker::Reader.new(@file_name, 200, 1)
 
     begin
-      timeout(1) do
+      timeout(@read_timeout) do
         reader.read do |ip|
           counter += 1
           ip_hash[ip] ||= 0
@@ -44,7 +45,7 @@ describe "ip blocker" do
     t_reader = Thread.new do
       begin
         reader = IPBlocker::Reader.new(tempfile.path, 200, 1)
-        timeout(1) do
+        timeout(@read_timeout) do
           reader.read do |ip|
             counter += 1
             ip_hash[ip] ||= 0
