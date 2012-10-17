@@ -13,11 +13,18 @@ module IPBlocker
            :boolean => true,
            :default => false
 
-    option :logfile,
-           :short => "-l LOGFILE",
-           :long => "--logfile LOGFILE",
+    option :file,
+           :short => "-f FILE",
+           :long => "--file FILE",
            :description => "Log file to scan continuously",
            :required => true
+
+    option :lines,
+           :short => "-l LINES",
+           :long => "--lines LINES",
+           :description => "Number of past log lines to review before tailing new ones",
+           :required => false,
+           :default => 1000
 
     option :help,
            :short => "-h",
@@ -33,37 +40,33 @@ module IPBlocker
       queue = Queue.new
       hash = Hash.new
 
-      if config[:logfile]
-
-        puts "reading IPs from #{config[:logfile]}"
+      if config[:file]
+        puts "reading initial #{config[:lines]} lines from log file from #{config[:file]}...."
 
         Thread.new do
-          reader = IPBlocker::Reader.new(config[:logfile], 1000, 1)
+          reader = IPBlocker::Reader.new(config[:file], config[:lines].to_i, 1)
           reader.read do |ip|
             queue << ip
-            #puts "#{ip}"
           end
         end
 
         consumer = Thread.new do
-          top_ips = []
           loop do
             while !queue.empty?
               ip = queue.pop
               if ip
                 hash[ip] ||= 0
                 hash[ip] += 1
-                top_ips = hash.keys.sort { |a, b| hash[a] <=> hash[b] }.slice(0, 5)
               end
             end
-            sleep 1
+            top_ips = hash.keys.sort { |a, b| hash[b] <=> hash[a] }.slice(0, 5)
             puts "top five ips: #{top_ips.inject(Hash.new) { |h, ip| h[ip] = hash[ip]; h }}"
+            sleep 1
           end
         end
-
-        sleep 5
-        consumer.join
       end
+
+      consumer.join
 
       Signal.trap("TERM") do
         puts "closing connections"
