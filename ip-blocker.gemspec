@@ -16,4 +16,6 @@ Gem::Specification.new do |gem|
   gem.version       = IPBlocker::VERSION
 
   gem.add_dependency "file-tail"
+  gem.add_dependency "mixlib-cli"
+  gem.add_dependency "daemon"
 end

@@ -41,9 +41,9 @@ describe "ip blocker" do
 
     counter = 0
     ip_hash = {}
-    reader = IPBlocker::Reader.new(tempfile.path, 200, 1)
     t_reader = Thread.new do
       begin
+        reader = IPBlocker::Reader.new(tempfile.path, 200, 1)
         timeout(1) do
           reader.read do |ip|
             counter += 1
@@ -65,7 +65,6 @@ describe "ip blocker" do
 
     t_reader.join
     t_writer.join
-
 
     counter.should eql(105)
     ip_hash.keys.size.should eql(83)

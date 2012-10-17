@@ -1,5 +1,6 @@
 require "ip-blocker/version"
-require "ip-blocker/file_reader"
+require "ip-blocker/reader"
+require "ip-blocker/cli"
 
 module IPBlocker
 end

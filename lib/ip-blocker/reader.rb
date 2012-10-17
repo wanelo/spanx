@@ -2,17 +2,15 @@ require 'file-tail'
 
 module IPBlocker
   class Reader
-    attr_accessor :file, :backward, :interval
+    attr_accessor :file
 
     def initialize file, backward = 1000, interval = 1
-      @backward = backward
-      @interval = interval
       @file = IPBlocker::File.new(file)
       @file.interval = interval
+      @file.backward(backward)
     end
 
     def read &block
-      @file.backward(backward)
       @file.tail { |line| block.call(extract_ip(line)) }
     end
 

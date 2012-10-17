@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require 'ip-blocker'
+
+IPBlocker::CLI.new.run
