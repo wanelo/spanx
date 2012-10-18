@@ -4,7 +4,7 @@ require 'ip-blocker/reader'
 require 'thread'
 
 module IPBlocker
-  class CLI
+  class CLI < Base
     include Mixlib::CLI
 
     option :daemonize,
@@ -13,9 +13,9 @@ module IPBlocker
            :boolean => true,
            :default => false
 
-    option :file,
-           :short => "-f FILE",
-           :long => "--file FILE",
+    option :log_file,
+           :short => "-f LOGFILE",
+           :long => "--file LOGFILE",
            :description => "Log file to scan continuously",
            :required => false
 
@@ -30,8 +30,14 @@ module IPBlocker
            :short => '-c CONFIG',
            :long => '--config CONFIG',
            :description => 'Path to config file (YML)',
+           :required => true
+
+    option :whitelist_file,
+           :short => '-w WHITELIST',
+           :long => '--whitelist WHITELIST',
+           :description => 'File containing newline separated regular expressions to exclude log lines from blocker',
            :required => false,
-           :default => "./ip-blocker-config.yml"
+           :default => nil
 
     option :help,
            :short => "-h",
@@ -43,6 +49,7 @@ module IPBlocker
            :exit => 0
 
     def run(argv = ARGV)
+      parse_options argv
       config.merge! IPBlocker::Config.new(config[:config_file])
       parse_options argv
 
@@ -52,14 +59,9 @@ module IPBlocker
     end
 
     def validate!
-      unless config[:file] && File.exists?(config[:file])
+      unless config[:log_file] && File.exists?(config[:log_file])
         error_exit_with_msg("Could not find file. Use -f or set :file in config_file")
       end
-    end
-
-    def error_exit_with_msg(msg)
-      $stderr.puts msg
-      exit 1
     end
   end
 end
