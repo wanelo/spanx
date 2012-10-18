@@ -1,3 +1,4 @@
+require "yaml"
 module IPBlocker
   class Config < Hash
     attr_accessor :filename

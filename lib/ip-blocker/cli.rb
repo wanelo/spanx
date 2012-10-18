@@ -17,7 +17,7 @@ module IPBlocker
            :short => "-f FILE",
            :long => "--file FILE",
            :description => "Log file to scan continuously",
-           :required => true
+           :required => false
 
     option :lines,
            :short => "-l LINES",
@@ -43,9 +43,23 @@ module IPBlocker
            :exit => 0
 
     def run(argv = ARGV)
-      parse_options(argv)
       config.merge! IPBlocker::Config.new(config[:config_file])
+      parse_options argv
+
+      validate!
+
       IPBlocker::Runner.new(config).run
+    end
+
+    def validate!
+      unless config[:file] && File.exists?(config[:file])
+        error_exit_with_msg("Could not find file. Use -f or set :file in config_file")
+      end
+    end
+
+    def error_exit_with_msg(msg)
+      $stderr.puts msg
+      exit 1
     end
   end
 end
