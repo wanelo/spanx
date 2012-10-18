@@ -1,10 +1,10 @@
-require_relative 'spec_helper'
+require 'spec_helper'
 require 'file/tail'
 require 'timeout'
 require 'thread'
 require 'tempfile'
 
-describe "ip blocker" do
+describe IPBlocker::Reader do
 
   before do
     @file_name = "spec/fixtures/access.log.1"

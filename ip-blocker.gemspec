@@ -15,7 +15,15 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = IPBlocker::VERSION
 
-  gem.add_dependency "file-tail"
-  gem.add_dependency "mixlib-cli"
-  gem.add_dependency "daemon"
+  gem.add_dependency 'file-tail'
+  gem.add_dependency 'mixlib-cli'
+  gem.add_dependency 'daemon'
+  gem.add_dependency 'redis'
+
+  gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'fakeredis'
+
+  gem.add_development_dependency 'guard-rspec'
+  gem.add_development_dependency 'rb-fsevent'
+
 end

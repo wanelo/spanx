@@ -26,6 +26,13 @@ module IPBlocker
            :required => false,
            :default => 1000
 
+    option :config_file,
+           :short => '-c CONFIG',
+           :long => '--config CONFIG',
+           :description => 'Path to config file (YML)',
+           :required => false,
+           :default => "./ip-blocker-config.yml"
+
     option :help,
            :short => "-h",
            :long => "--help",
@@ -36,43 +43,9 @@ module IPBlocker
            :exit => 0
 
     def run(argv = ARGV)
-      parse_options
-      queue = Queue.new
-      hash = Hash.new
-
-      if config[:file]
-        puts "reading initial #{config[:lines]} lines from log file from #{config[:file]}...."
-
-        Thread.new do
-          reader = IPBlocker::Reader.new(config[:file], config[:lines].to_i, 1)
-          reader.read do |ip|
-            queue << ip
-          end
-        end
-
-        consumer = Thread.new do
-          loop do
-            while !queue.empty?
-              ip = queue.pop
-              if ip
-                hash[ip] ||= 0
-                hash[ip] += 1
-              end
-            end
-            top_ips = hash.keys.sort { |a, b| hash[b] <=> hash[a] }.slice(0, 5)
-            puts "top five ips: #{top_ips.inject(Hash.new) { |h, ip| h[ip] = hash[ip]; h }}"
-            sleep 1
-          end
-        end
-      end
-
-      consumer.join
-
-      Signal.trap("TERM") do
-        puts "closing connections"
-        exit 0
-      end
-
+      parse_options(argv)
+      config.merge! IPBlocker::Config.new(config[:config_file])
+      IPBlocker::Runner.new(config).run
     end
   end
 end
