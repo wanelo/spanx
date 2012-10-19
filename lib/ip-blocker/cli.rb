@@ -53,7 +53,6 @@ module IPBlocker
     def run(argv = ARGV)
       generate_config(argv)
       validate!
-
       IPBlocker.redis(config[:redis])
       IPBlocker::Runner.new(config).run
     end

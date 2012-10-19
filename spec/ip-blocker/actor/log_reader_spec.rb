@@ -9,8 +9,8 @@ describe IPBlocker::Actor::LogReader do
   def test_log_file(file, expected_ip_count, expected_line_count, whitelist = nil)
     counter = 0
     ip_hash = {}
-    reader = IPBlocker::Actor::LogReader.new(file, 200, 1)
-    reader.whitelist = whitelist
+    reader = IPBlocker::Actor::LogReader.new(file, Queue.new, 1, whitelist)
+    reader.file.backward(1000)
 
     t_reader = Thread.new do
       begin
@@ -36,30 +36,32 @@ describe IPBlocker::Actor::LogReader do
   let(:file_name) { "spec/fixtures/access.log.1" }
   let(:read_timeout) { 0.05 }
 
-  it "should be able to read and parse IPs from a static file" do
-    test_log_file(file_name, 82, 104)
-  end
+  context "#read" do
+    it "should be able to read and parse IPs from a static file" do
+      test_log_file(file_name, 82, 104)
+    end
 
-  it "should be able to read and parse IPs from a file being appended to" do
-    tempfile = Tempfile.new("access.log")
+    it "should be able to read and parse IPs from a file being appended to" do
+      tempfile = Tempfile.new("access.log")
 
-    contents = ::File.read(file_name)
-    tempfile.write(contents)
-    tempfile.close
+      contents = ::File.read(file_name)
+      tempfile.write(contents)
+      tempfile.close
 
-    test_log_file(tempfile.path, 83, 105) do
-      t_log_appender = Thread.new do
-        ::File.open(tempfile.path, "a") do |t|
-          t.write("9.9.9.9 - content")
+      test_log_file(tempfile.path, 83, 105) do
+        t_log_appender = Thread.new do
+          ::File.open(tempfile.path, "a") do |t|
+            t.write("9.9.9.9 - content")
+          end
         end
+        t_log_appender.join
       end
-      t_log_appender.join
     end
   end
 
-  context "bots" do
+  context "#whitelist" do
     let(:whitelist_file) { "spec/fixtures/whitelist.txt" }
-    it "should be able to read and exclude googlebot IPs from a static file" do
+    it "should exclude googlebot log lines" do
       test_log_file("spec/fixtures/access.log.bots", 1, 1, IPBlocker::Whitelist.new(whitelist_file))
     end
   end

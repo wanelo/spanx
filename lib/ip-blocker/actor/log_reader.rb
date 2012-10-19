@@ -3,14 +3,22 @@ require 'file-tail'
 module IPBlocker
   module Actor
     class LogReader
-      attr_accessor :file
-      attr_accessor :whitelist
+      attr_accessor :file, :queue, :whitelist
 
-      def initialize file, backward = 1000, interval = 1, whitelist = nil
+      def initialize file, queue, interval = 1, whitelist = nil
         @file = IPBlocker::Actor::File.new(file)
         @file.interval = interval
-        @file.backward(backward)
+        @file.backward(0)
         @whitelist = whitelist
+        @queue = queue
+      end
+
+      def run
+        Thread.new do
+          self.read do |line|
+            queue << [ extract_ip(line), Time.now.to_i ]
+          end
+        end
       end
 
       def read &block

@@ -7,4 +7,5 @@
 :resolution: 300       # seconds
 :history: 21600        # seconds
 :buffer:
+  :tail_interval: 1
   :flush_interval: 5

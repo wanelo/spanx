@@ -28,12 +28,12 @@ module IPBlocker
         Thread.new do
           loop do
             semaphore.synchronize {
-              log "flushing local cache to redis, [#{cache.keys.size}] keys in the cache."
+              log "flush cache begin [#{cache.keys.size}] keys"
               cache.each_pair do |key, count|
                 adapter.increment_ip key[0], key[1], count
               end
               reset_cache
-              log "finished flushing the cache, new size [#{cache.keys.size}]..."
+              log "flush cache finished"
             }
             sleep config[:buffer][:flush_interval]
           end
