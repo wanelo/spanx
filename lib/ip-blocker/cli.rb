@@ -1,6 +1,6 @@
 require 'daemon'
 require 'mixlib/cli'
-require 'ip-blocker/reader'
+require 'ip-blocker/log_reader'
 require 'thread'
 
 module IPBlocker
@@ -55,6 +55,7 @@ module IPBlocker
 
       validate!
 
+      IPBlocker.redis(config)
       IPBlocker::Runner.new(config).run
     end
 

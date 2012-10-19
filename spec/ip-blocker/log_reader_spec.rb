@@ -4,12 +4,12 @@ require 'timeout'
 require 'thread'
 require 'tempfile'
 
-describe IPBlocker::Reader do
+describe IPBlocker::LogReader do
 
   def test_log_file(file, expected_ip_count, expected_line_count, whitelist = nil)
     counter = 0
     ip_hash = {}
-    reader = IPBlocker::Reader.new(file, 200, 1)
+    reader = IPBlocker::LogReader.new(file, 200, 1)
     reader.whitelist = whitelist
 
     t_reader = Thread.new do
@@ -48,12 +48,12 @@ describe IPBlocker::Reader do
     tempfile.close
 
     test_log_file(tempfile.path, 83, 105) do
-      t_writer = Thread.new do
+      t_log_appender = Thread.new do
         ::File.open(tempfile.path, "a") do |t|
           t.write("9.9.9.9 - content")
         end
       end
-      t_writer.join
+      t_log_appender.join
     end
   end
 

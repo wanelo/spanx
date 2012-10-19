@@ -1,7 +1,7 @@
 require 'file-tail'
 
 module IPBlocker
-  class Reader
+  class LogReader
     attr_accessor :file
     attr_accessor :whitelist
 

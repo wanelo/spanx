@@ -4,3 +4,5 @@
   :port: 6380
   :database: 1
 :file: ""
+:resolution: 300       # seconds
+:history: 6 * 60 * 60  # seconds
