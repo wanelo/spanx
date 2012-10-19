@@ -1,5 +1,6 @@
 module IPBlocker
-  class Whitelist < Base
+  class Whitelist
+    include IPBlocker::Helper
     attr_accessor :patterns, :filename
 
     def initialize(filename)

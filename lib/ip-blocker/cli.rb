@@ -1,10 +1,11 @@
 require 'daemon'
 require 'mixlib/cli'
-require 'ip-blocker/log_reader'
+require 'ip-blocker/actor/log_reader'
 require 'thread'
 
 module IPBlocker
-  class CLI < Base
+  class CLI
+    include IPBlocker::Helper
     include Mixlib::CLI
 
     option :daemonize,

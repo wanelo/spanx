@@ -4,12 +4,12 @@ require 'timeout'
 require 'thread'
 require 'tempfile'
 
-describe IPBlocker::LogReader do
+describe IPBlocker::Actor::LogReader do
 
   def test_log_file(file, expected_ip_count, expected_line_count, whitelist = nil)
     counter = 0
     ip_hash = {}
-    reader = IPBlocker::LogReader.new(file, 200, 1)
+    reader = IPBlocker::Actor::LogReader.new(file, 200, 1)
     reader.whitelist = whitelist
 
     t_reader = Thread.new do

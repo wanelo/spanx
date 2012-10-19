@@ -1,6 +1,6 @@
 module IPBlocker
-  module Redis
-    class Blocker
+  module Actor
+    class Analyzer
 
     end
   end

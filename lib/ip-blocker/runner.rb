@@ -1,6 +1,6 @@
 require 'daemon'
 require 'mixlib/cli'
-require 'ip-blocker/log_reader'
+require 'ip-blocker/actor/log_reader'
 require 'ip-blocker/whitelist'
 require 'thread'
 
@@ -19,10 +19,10 @@ module IPBlocker
       queue = Queue.new
       log "reading from log file from #{config[:log_file]}...."
 
-      IPBlocker::Collector.new(config, queue).run
+      IPBlocker::Actor::Collector.new(config, queue).run
 
       Thread.new do
-        IPBlocker::LogReader.new(config[:log_file],
+        IPBlocker::Actor::LogReader.new(config[:log_file],
                                  0,
                                  1,
                                  IPBlocker::Whitelist.new(config[:whitelist_file])).read do |ip|
