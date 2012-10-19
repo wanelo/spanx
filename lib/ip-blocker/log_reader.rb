@@ -5,10 +5,11 @@ module IPBlocker
     attr_accessor :file
     attr_accessor :whitelist
 
-    def initialize file, backward = 1000, interval = 1
+    def initialize file, backward = 1000, interval = 1, whitelist = nil
       @file = IPBlocker::File.new(file)
       @file.interval = interval
       @file.backward(backward)
+      @whitelist = whitelist
     end
 
     def read &block

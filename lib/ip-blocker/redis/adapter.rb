@@ -8,6 +8,7 @@ module IPBlocker
 
     class Adapter
       attr_accessor :resolution, :blocks_to_keep, :history
+      include IPBlocker::Helper
 
       def initialize(config)
         @resolution = config[:resolution]
@@ -15,11 +16,10 @@ module IPBlocker
         @history = config[:history]
       end
 
-
-      def increment_ip(ip)
+      def increment_ip(ip, timestamp = nil, count = 1)
         k = key(ip)
         redis.multi do |redis|
-          redis.zincrby k, 1, current_timestamp
+          redis.zincrby k, count, period_marker(resolution, timestamp)
           redis.expire k, history
         end
 
@@ -34,10 +34,6 @@ module IPBlocker
 
       def key(ip)
         "i:#{ip}"
-      end
-
-      def current_timestamp(time = Time.now)
-        time.to_i / resolution * resolution
       end
 
       def redis

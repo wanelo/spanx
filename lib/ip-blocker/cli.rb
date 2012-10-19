@@ -19,18 +19,19 @@ module IPBlocker
            :description => "Log file to scan continuously",
            :required => false
 
-    option :lines,
-           :short => "-l LINES",
-           :long => "--lines LINES",
-           :description => "Number of past log lines to review before tailing new ones",
-           :required => false,
-           :default => 1000
-
     option :config_file,
            :short => '-c CONFIG',
            :long => '--config CONFIG',
            :description => 'Path to config file (YML)',
            :required => true
+
+    option :debug,
+           :short => '-g',
+           :long => '--debug',
+           :description => 'Log stuff',
+           :boolean => true,
+           :required => false,
+           :default => false
 
     option :whitelist_file,
            :short => '-w WHITELIST',
@@ -49,19 +50,28 @@ module IPBlocker
            :exit => 0
 
     def run(argv = ARGV)
-      parse_options argv
-      config.merge! IPBlocker::Config.new(config[:config_file])
-      parse_options argv
-
+      generate_config(argv)
       validate!
 
-      IPBlocker.redis(config)
+      IPBlocker.redis(config[:redis])
       IPBlocker::Runner.new(config).run
     end
+
+    private
 
     def validate!
       unless config[:log_file] && File.exists?(config[:log_file])
         error_exit_with_msg("Could not find file. Use -f or set :file in config_file")
+      end
+    end
+
+    def generate_config(argv)
+      parse_options argv
+      config.merge! IPBlocker::Config.new(config[:config_file])
+      parse_options argv
+
+      unless config[:debug]
+        ::IPBlocker::Helper.send(:define_method, :log, proc { |msg| })
       end
     end
   end
