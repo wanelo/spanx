@@ -15,7 +15,9 @@ module IPBlocker
 
       def run
         Thread.new do
+          Thread.current[:name] = "collector:queue"
           loop do
+            log "#{queue.size} IPs on the queue"
             while !queue.empty?
               semaphore.synchronize {
                 increment_ip *(queue.pop)
@@ -26,30 +28,31 @@ module IPBlocker
         end
 
         Thread.new do
+          Thread.current[:name] = "collector:flush"
           loop do
             semaphore.synchronize {
-              log "flush cache begin [#{cache.keys.size}] keys"
-              cache.each_pair do |key, count|
-                adapter.increment_ip key[0], key[1], count
+              logging "flushing cache with [#{cache.keys.size}] keys" do
+                cache.each_pair do |key, count|
+                  adapter.increment_ip key[0], key[1], count
+                end
+                reset_cache
               end
-              reset_cache
-              log "flush cache finished"
             }
-            sleep config[:buffer][:flush_interval]
+            sleep config[:collector][:flush_interval]
           end
         end
       end
 
       def increment_ip(ip, timestamp)
-        cache[[ip, period_marker(config[:resolution], timestamp)]] += 1
+        cache[[ip, period_marker(config[:collector][:resolution], timestamp)]] += 1
       end
 
       private
+
       def reset_cache
         @cache.clear
         GC.start
       end
-
     end
   end
 end

@@ -1,11 +1,21 @@
 ---
+:log_file: ""
 :redis:
   :host: "127.0.0.1"
   :port: 6379
   :db: 1
-:file: ""
-:resolution: 300       # seconds
-:history: 21600        # seconds
-:buffer:
-  :tail_interval: 1
+:collector:
+  :resolution: 300       # seconds
+  :history: 21600        # seconds
   :flush_interval: 5
+:log_reader:
+  :tail_interval: 1
+:analyzer:
+  :analyze_interval: 20
+  :period_checks:
+    - :period_seconds: 3600
+      :max_allowed: 3600
+    - :period_seconds: 600
+      :max_allowed: 600
+    - :period_seconds: 21600
+      :max_allowed: 10000

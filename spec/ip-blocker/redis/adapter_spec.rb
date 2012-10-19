@@ -10,15 +10,15 @@ describe IPBlocker::Redis::Adapter do
 
   let(:resolution) { 10 }
   let(:history) { 60 }
-  let(:adapter) { IPBlocker::Redis::Adapter.new(resolution: resolution, history: history) }
+  let(:adapter) { IPBlocker::Redis::Adapter.new(collector: {resolution: resolution, history: history}) }
   let(:redis) { IPBlocker.redis }
 
   describe '#increment_ip' do
     let(:ip) { "127.0.0.1" }
 
     it "should add IP to a redis set" do
-      adapter.increment_ip(ip)
-      set = redis.zrange(adapter.key(ip), 0, -1, :with_scores => true)
+      adapter.increment_ip(ip, Time.now.to_i)
+      set = redis.zrange(adapter.send(:key, ip), 0, -1, :with_scores => true)
       set.should_not be_empty
       set.size.should eql(1)
       set[0].size.should eql(2)
@@ -26,7 +26,8 @@ describe IPBlocker::Redis::Adapter do
 
     it "should remove old IP from a redis set" do
       time = Time.now
-      redis.should_receive(:zrem).with(adapter.key(ip), [adapter.period_marker(resolution, time).to_s])
+      redis.should_receive(:zrem).with(adapter.send(:key, ip), [adapter.period_marker(resolution, time)])
+
       adapter.blocks_to_keep = 1
       Timecop.freeze time do
         adapter.increment_ip(ip, Time.now.to_i)
@@ -37,14 +38,14 @@ describe IPBlocker::Redis::Adapter do
     end
 
     it "sets expiry on IP key" do
-      redis.should_receive(:expire).with(adapter.key(ip), history)
-      adapter.increment_ip(ip)
+      redis.should_receive(:expire).with(adapter.send(:key, ip), history)
+      adapter.increment_ip(ip, Time.now.to_i)
     end
   end
 
   describe "#key" do
     it "prefixes IP" do
-      adapter.key("abc").should == "i:abc"
+      adapter.send(:key, "abc").should == "i:abc"
     end
   end
 

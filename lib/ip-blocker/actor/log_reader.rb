@@ -15,6 +15,7 @@ module IPBlocker
 
       def run
         Thread.new do
+          Thread.current[:name] = "log_reader"
           self.read do |line|
             queue << [ extract_ip(line), Time.now.to_i ]
           end

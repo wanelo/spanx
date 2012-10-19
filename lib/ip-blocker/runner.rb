@@ -7,18 +7,19 @@ require 'thread'
 module IPBlocker
   class Runner
     include IPBlocker::Helper
-    attr_accessor :config, :log_reader, :analyzer, :queue
+    attr_accessor :config, :queue
 
     def initialize(config)
       @config = config
+      @queue = Queue.new
     end
 
     def run
       return unless config[:log_file]
 
-      @queue = Queue.new
       log "booting, tailing the log file #{config[:log_file]}...."
       collector.run
+      analyzer.run
       log_reader.run.join
     end
 
@@ -32,7 +33,11 @@ module IPBlocker
     end
 
     def log_reader
-      @log_reader ||= IPBlocker::Actor::LogReader.new(config[:log_file], queue, config[:buffer][:tail_interval], whitelist)
+      @log_reader ||= IPBlocker::Actor::LogReader.new(config[:log_file], queue, config[:log_reader][:tail_interval], whitelist)
+    end
+
+    def analyzer
+      @analyzer ||= IPBlocker::Actor::Analyzer.new(config)
     end
   end
 end
