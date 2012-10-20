@@ -23,10 +23,15 @@ module IPBlocker
       def write
         ips = adapter.blocked_ips
         logging "writing out #{ips.size} IP rules into #{@block_file}" do
-          File.open(@block_file, "w") do |file|
-            ips.sort.each do |ip|
-              file.puts("deny #{ip};")
+          begin
+            File.open(@block_file, "w") do |file|
+              ips.sort.each do |ip|
+                file.puts("deny #{ip};")
+              end
             end
+          rescue Exception => e
+            log "ERROR writing to block file #{@block_file}, #{e.inspect}"
+            exit 1
           end
         end
       end

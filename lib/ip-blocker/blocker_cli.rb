@@ -68,7 +68,6 @@ module IPBlocker
     def validate!
       error_exit_with_msg("Could not find file. Use -f or set :file in config_file") unless config[:log_file] && File.exists?(config[:log_file])
       error_exit_with_msg("-b block_file is required") unless config[:block_file]
-      error_exit_with_msg("File #{config[:block_file]} is not writeable!") unless File.writeable?(config[:block_file])
     end
 
     def generate_config(argv)
