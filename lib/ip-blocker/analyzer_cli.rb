@@ -4,7 +4,8 @@ require 'ip-blocker/actor/log_reader'
 require 'thread'
 
 module IPBlocker
-  class CLI
+  class AnalyzerCLI
+
     include IPBlocker::Helper
     include Mixlib::CLI
 
@@ -13,12 +14,6 @@ module IPBlocker
            :long => "--daemonize",
            :boolean => true,
            :default => false
-
-    option :log_file,
-           :short => "-f LOGFILE",
-           :long => "--file LOGFILE",
-           :description => "Log file to scan continuously",
-           :required => false
 
     option :config_file,
            :short => '-c CONFIG',
@@ -29,17 +24,10 @@ module IPBlocker
     option :debug,
            :short => '-g',
            :long => '--debug',
-           :description => 'Log stuff',
+           :description => 'Log status to STDOUT',
            :boolean => true,
            :required => false,
            :default => false
-
-    option :whitelist_file,
-           :short => '-w WHITELIST',
-           :long => '--whitelist WHITELIST',
-           :description => 'File containing newline separated regular expressions to exclude log lines from blocker',
-           :required => false,
-           :default => nil
 
     option :help,
            :short => "-h",
@@ -52,26 +40,18 @@ module IPBlocker
 
     def run(argv = ARGV)
       generate_config(argv)
-      validate!
       IPBlocker.redis(config[:redis])
-      IPBlocker::Runner.new(config).run
+      IPBlocker::Runner.new(config).run_analyzer
     end
 
     private
-
-    def validate!
-      unless config[:log_file] && File.exists?(config[:log_file])
-        error_exit_with_msg("Could not find file. Use -f or set :file in config_file")
-      end
-    end
 
     def generate_config(argv)
       parse_options argv
       config.merge! IPBlocker::Config.new(config[:config_file])
       parse_options argv
-
       unless config[:debug]
-        ::IPBlocker::Helper.send(:define_method, :log, proc { |msg| })
+        ::IPBlocker::Helper.send(:define_method, :log, proc { |msg|})
       end
     end
   end

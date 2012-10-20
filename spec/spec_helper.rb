@@ -7,7 +7,7 @@
 
 require 'ip-blocker'
 
-Dir['spec/support/**/*.rb'].each { |filename| require_relative "../#{filename}"}
+Dir['spec/support/**/*.rb'].each { |filename| require_relative "../#{filename}" }
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
@@ -20,3 +20,5 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = 'random'
 end
+
+IPBlocker::Helper.send(:define_method, :log, proc { |msg| })

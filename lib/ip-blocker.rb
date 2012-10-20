@@ -5,8 +5,9 @@ require 'ip-blocker/runner'
 require 'ip-blocker/actor/log_reader'
 require 'ip-blocker/actor/collector'
 require 'ip-blocker/actor/analyzer'
-require 'ip-blocker/writer'
-require 'ip-blocker/cli'
+require 'ip-blocker/actor/writer'
+require 'ip-blocker/blocker_cli'
+require 'ip-blocker/analyzer_cli'
 require 'ip-blocker/redis/adapter'
 require 'ip-blocker/whitelist'
 require 'redis'
@@ -21,14 +22,14 @@ module IPBlocker
   class BlockedIp < Struct.new(:ip, :period, :count, :time_blocked)
   end
 
-  class PeriodCheck < Struct.new(:period_seconds, :max_allowed)
+  class PeriodCheck < Struct.new(:period_seconds, :max_allowed, :block_ttl)
     def <=>(other)
       self.period_seconds <=> other.period_seconds
     end
 
     def self.from_config(config)
-      config[:analyzer][:period_checks].map do |check|
-        self.new(check[:period_seconds], check[:max_allowed])
+      @periods ||= config[:analyzer][:period_checks].map do |check|
+        self.new(check[:period_seconds], check[:max_allowed], check[:block_ttl])
       end.sort
     end
   end

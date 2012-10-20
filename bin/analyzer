@@ -4,4 +4,4 @@ require 'rubygems'
 require 'bundler/setup' if File.exists?(ENV['BUNDLE_GEMFILE'])
 require 'ip-blocker'
 
-IPBlocker::BlockerCLI.new.run
+IPBlocker::AnalyzerCLI.new.run

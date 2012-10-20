@@ -1,5 +1,6 @@
 ---
 :log_file: ""
+:block_file: "block-ips.conf"
 :redis:
   :host: "127.0.0.1"
   :port: 6379
@@ -15,7 +16,12 @@
   :period_checks:
     - :period_seconds: 3600
       :max_allowed: 3600
+      :block_ttl: 7200
     - :period_seconds: 600
       :max_allowed: 600
+      :block_ttl: 1200
     - :period_seconds: 21600
       :max_allowed: 10000
+      :block_ttl: 431200
+:writer:
+  :write_interval: 10

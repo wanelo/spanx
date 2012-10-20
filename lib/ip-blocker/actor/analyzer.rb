@@ -1,16 +1,13 @@
 module IPBlocker
   module Actor
-
-
     class Analyzer
       include IPBlocker::Helper
-      attr_accessor :config, :adapter, :writer, :periods
+      attr_accessor :config, :adapter, :periods
 
       def initialize config
         @config = config
-        #@writer = IPBlocker::Writer.new(config)
         @adapter = IPBlocker::Redis::Adapter.new(config)
-        @periods = PeriodCheck.from_config(config)
+        @periods = IPBlocker::PeriodCheck.from_config(config)
       end
 
       def run
@@ -18,23 +15,24 @@ module IPBlocker
           Thread.current[:name] = "analyzer"
           log "starting analyzer loop..."
           loop do
-            blocked_ips = analyze_all_ips()
-            # writer.write!
+            analyze_all_ips()
             sleep config[:analyzer][:analyze_interval]
           end
         end
       end
 
+      # Look through every IP on the stack. IPs that fulfill a PeriodCheck
+      # are pushed onto a redis block list.
       def analyze_all_ips
         blocked_ips = []
         ips = adapter.ips
         logging "analyzing #{ips.size} IPs" do
           ips.each do |ip|
-            ip = analyze_ip(ip)
-            blocked_ips << ip if ip
+            ip_block = analyze_ip(ip)
+            blocked_ips << ip_block if ip_block
           end
         end
-        blocked_ips
+        adapter.block_ips(blocked_ips)
       end
 
       # Analyze individual IP for all defined periods.  As soon as one

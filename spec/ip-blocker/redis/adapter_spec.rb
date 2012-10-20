@@ -43,6 +43,35 @@ describe IPBlocker::Redis::Adapter do
     end
   end
 
+  describe '#block_ips'  do
+    let(:ip) { "192.168.0.1" }
+    let(:key) { "b:#{ip}" }
+    let(:blocked_ip) { IPBlocker::BlockedIp.new(ip, mock(block_ttl: 10000), 5, 1234567) }
+
+    it "saves ip to redis with expiration" do
+      adapter.block_ips([blocked_ip])
+      redis.get(key).should_not be_nil
+      redis.ttl(key).should == 10000
+    end
+  end
+
+  describe '#blocked_ips' do
+    before do
+      period = mock(block_ttl: 10)
+      adapter.block_ips(%w[123.456.7.8 5.6.7.8].map do |ip|
+        IPBlocker::BlockedIp.new(ip, period, 5, Time.now.to_i)
+      end)
+      adapter.block_ips(%w[123.456.7.9].map do |ip|
+        IPBlocker::BlockedIp.new(ip, period, 5, Time.now.to_i)
+      end)
+      adapter.increment_ip("123.456.7.50", Time.now.to_i, 500)
+    end
+
+    it "returns blocked ips" do
+      adapter.blocked_ips.should == %w(123.456.7.8 5.6.7.8 123.456.7.9)
+    end
+  end
+
   describe "#key" do
     it "prefixes IP" do
       adapter.send(:key, "abc").should == "i:abc"

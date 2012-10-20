@@ -26,25 +26,35 @@ module IPBlocker
         end
       end
 
-
       def ips
-        keys.map{|key| ip(key)}
+        keys.map { |key| ip(key) }
       end
 
       def ip_history(ip)
         extract_set_elements(key(ip))
       end
 
+      def block_ips(blocked_ips)
+        logging "storing #{blocked_ips.size} blocked ips" do
+          blocked_ips.each do |blocked_ip|
+            redis.setex("b:#{blocked_ip.ip}", blocked_ip.period.block_ttl, nil)
+          end
+        end
+      end
+
+      def blocked_ips
+        blocked_keys.map { |key| ip(key) }
+      end
+
       private
 
       def ip(key)
-        key.gsub(/^i:/, '')
+        key.gsub(/^(i|b):/, '')
       end
 
       def redis
         IPBlocker.redis
       end
-
 
       def get(key)
         extract_set_elements(key)
@@ -56,6 +66,10 @@ module IPBlocker
 
       def keys
         redis.keys("i:*")
+      end
+
+      def blocked_keys
+        redis.keys("b:*")
       end
 
       def extract_set_elements(key)

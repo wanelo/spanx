@@ -11,7 +11,7 @@ describe IPBlocker::Actor::Analyzer do
   let(:analyzer) { IPBlocker::Actor::Analyzer.new(config) }
   let(:config) {
     {
-        analyzer: {period_checks: periods},
+        analyzer: {period_checks: periods, block_timeout: 50},
         collector: {resolution: 10, history: 100}
     }
   }
@@ -30,17 +30,18 @@ describe IPBlocker::Actor::Analyzer do
 
   let(:adapter) { analyzer.adapter }
 
-  describe "#analyze_ip" do
-    let(:ip1) { "127.0.0.1" }
-    let(:ip2) { "192.168.0.1" }
+  let(:ip1) { "127.0.0.1" }
+  let(:ip2) { "192.168.0.1" }
 
-    context "#periods" do
-      it "should properly assign periods" do
-        analyzer.periods.should_not be_empty
-        analyzer.periods.size.should eql(2)
-        IPBlocker::PeriodCheck.from_config(config).should eql(period_structs)
-      end
+  context "#periods" do
+    it "should properly assign periods" do
+      analyzer.periods.should_not be_empty
+      analyzer.periods.size.should eql(2)
+      IPBlocker::PeriodCheck.from_config(config).should eql(period_structs)
     end
+  end
+
+  describe "#analyze_ip" do
 
     let(:now) { period_marker(10, Time.now.to_i) + 1 }
 
@@ -91,6 +92,23 @@ describe IPBlocker::Actor::Analyzer do
       it "return nil" do
         analyzer.adapter.increment_ip(ip1, Time.now.to_i)
         analyzer.analyze_ip(ip1).should be_nil
+      end
+    end
+  end
+
+  describe "#analyze_all_ips" do
+    context "danger IP is found" do
+      let(:blocked_ip) { IPBlocker::BlockedIp.new(ip2, double(), 200, 1234566)}
+
+      before do
+        adapter.should_receive(:ips).and_return([ip1, ip2])
+        analyzer.should_receive(:analyze_ip).with(ip1).and_return(nil)
+        analyzer.should_receive(:analyze_ip).with(ip2).and_return(blocked_ip)
+      end
+
+      it "blocks the IP" do
+        adapter.should_receive(:block_ips).with([blocked_ip])
+        analyzer.analyze_all_ips
       end
     end
   end

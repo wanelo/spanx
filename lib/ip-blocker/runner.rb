@@ -15,14 +15,16 @@ module IPBlocker
     end
 
     def run
-      return unless config[:log_file]
-
       log "booting, tailing the log file #{config[:log_file]}...."
+
       collector.run
-      analyzer.run
+      writer.run
       log_reader.run.join
     end
 
+    def run_analyzer
+      analyzer.run.join
+    end
 
     def collector
       @collector ||= IPBlocker::Actor::Collector.new(config, queue)
@@ -34,6 +36,10 @@ module IPBlocker
 
     def log_reader
       @log_reader ||= IPBlocker::Actor::LogReader.new(config[:log_file], queue, config[:log_reader][:tail_interval], whitelist)
+    end
+
+    def writer
+      @writer ||= IPBlocker::Actor::Writer.new(config)
     end
 
     def analyzer
