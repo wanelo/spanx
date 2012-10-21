@@ -13,7 +13,7 @@ describe Spanx::Config do
       let(:file) { "non_existent_file" }
       it "should write error to stderr" do
         $stderr.should_receive(:puts).with("Error: Unable to find config_file at #{file}")
-        $stdout.should_receive(:puts)
+        $stderr.should_receive(:puts).with(Spanx::USAGE)
         lambda {
           Spanx::Config.new(file)
         }.should raise_error(SystemExit)

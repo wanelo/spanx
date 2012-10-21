@@ -27,7 +27,7 @@ describe Spanx::Whitelist do
 
       it "writes an error to stderr and exits" do
         $stderr.should_receive(:puts).with("Error: Unable to find whitelist file at #{file}")
-        $stdout.should_receive(:puts)
+        $stderr.should_receive(:puts).with(Spanx::USAGE)
 
         lambda {
           whitelist.patterns

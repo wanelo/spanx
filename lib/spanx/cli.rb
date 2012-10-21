@@ -3,7 +3,6 @@ require 'spanx/helper/exit'
 
 module Spanx
   class CLI
-    include Mixlib::CLI
     include Spanx::Helper::Exit
     include Spanx::Helper::Subclassing
 
@@ -14,7 +13,7 @@ module Spanx
     def run(args = ARGV)
       @args = args
       validate!
-      self.class.subclass_class(args.shift).new.run
+      self.class.subclass_class(args.shift).new.run(args)
     end
 
 

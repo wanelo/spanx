@@ -3,7 +3,7 @@ module Spanx
     module Exit
       def error_exit_with_msg(msg)
         $stderr.puts "Error: #{msg}"
-        Spanx::Usage.print
+        $stderr.puts Spanx::USAGE
         exit 1
       end
     end

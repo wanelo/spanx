@@ -21,7 +21,7 @@ module Spanx
 
       collector.run
       writer.run
-      analyzer.run if config[:analyzer]
+      analyzer.run if config[:analyze]
       log_reader.run.join
     end
 
