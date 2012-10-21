@@ -1,12 +1,12 @@
-require 'mixlib/cli'
-require 'ip-blocker/actor/log_reader'
 require 'thread'
+require 'mixlib/cli'
 require 'daemons/daemonize'
+require 'ip-blocker/logger'
+require 'ip-blocker/actor/runner'
 
 module IPBlocker
   class AnalyzerCLI
 
-    include IPBlocker::Helper
     include Mixlib::CLI
 
     option :daemonize,
@@ -51,9 +51,8 @@ module IPBlocker
       parse_options argv
       config.merge! IPBlocker::Config.new(config[:config_file])
       parse_options argv
-      unless config[:debug]
-        ::IPBlocker::Helper.send(:define_method, :log, proc { |msg|})
-      end
+
+      IPBlocker::Logger.enable if config[:debug]
     end
   end
 end

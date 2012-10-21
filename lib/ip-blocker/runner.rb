@@ -1,11 +1,14 @@
 require 'mixlib/cli'
+require 'ip-blocker/logger'
+require 'ip-blocker/actor/collector'
+require 'ip-blocker/actor/analyzer'
 require 'ip-blocker/actor/log_reader'
+require 'ip-blocker/actor/writer'
 require 'ip-blocker/whitelist'
 require 'thread'
 
 module IPBlocker
   class Runner
-    include IPBlocker::Helper
     attr_accessor :config, :queue
 
     def initialize(config)
@@ -14,7 +17,7 @@ module IPBlocker
     end
 
     def run
-      log "booting, tailing the log file #{config[:log_file]}...."
+      Logger.log "booting, tailing the log file #{config[:log_file]}...."
 
       collector.run
       writer.run

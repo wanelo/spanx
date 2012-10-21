@@ -1,6 +1,10 @@
 require "yaml"
+require 'ip-blocker/helper/exit'
+
 module IPBlocker
   class Config < Hash
+    include IPBlocker::Helper::Exit
+
     attr_accessor :filename
 
     def initialize(filename)
@@ -16,8 +20,7 @@ module IPBlocker
       begin
         self.merge! ::YAML.load_file(filename)
       rescue Errno::ENOENT
-        $stderr.puts("Unable to find config_file at #{filename}")
-        exit(1)
+        error_exit_with_msg "Unable to find config_file at #{filename}"
       end
     end
   end

@@ -1,6 +1,8 @@
+require 'redis'
 require 'ip-blocker/version'
-require 'ip-blocker/config'
 require 'ip-blocker/helper'
+require 'ip-blocker/logger'
+require 'ip-blocker/config'
 require 'ip-blocker/runner'
 require 'ip-blocker/actor/log_reader'
 require 'ip-blocker/actor/collector'
@@ -10,7 +12,6 @@ require 'ip-blocker/blocker_cli'
 require 'ip-blocker/analyzer_cli'
 require 'ip-blocker/redis/adapter'
 require 'ip-blocker/whitelist'
-require 'redis'
 
 module IPBlocker
   class SetElement < Struct.new(:ts, :count)

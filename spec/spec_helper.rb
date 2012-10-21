@@ -5,6 +5,8 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+require 'rubygems'
+require 'bundler/setup' if File.exists?(ENV['BUNDLE_GEMFILE'])
 require 'ip-blocker'
 
 Dir['spec/support/**/*.rb'].each { |filename| require_relative "../#{filename}" }
@@ -20,5 +22,3 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = 'random'
 end
-
-IPBlocker::Helper.send(:define_method, :log, proc { |msg| })

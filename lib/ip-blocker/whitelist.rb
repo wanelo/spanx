@@ -1,6 +1,8 @@
+require 'ip-blocker/helper/exit'
+
 module IPBlocker
   class Whitelist
-    include IPBlocker::Helper
+    include IPBlocker::Helper::Exit
     attr_accessor :patterns, :filename
 
     def initialize(filename)

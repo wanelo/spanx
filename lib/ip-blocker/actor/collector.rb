@@ -1,7 +1,10 @@
+require 'ip-blocker/logger'
+require 'ip-blocker/helper/timing'
+
 module IPBlocker
   module Actor
     class Collector
-      include IPBlocker::Helper
+      include IPBlocker::Helper::Timing
 
       attr_accessor :queue, :config, :adapter, :semaphore, :cache
 
@@ -17,7 +20,7 @@ module IPBlocker
         Thread.new do
           Thread.current[:name] = "collector:queue"
           loop do
-            log "#{queue.size} IPs on the queue"
+            Logger.log "#{queue.size} IPs on the queue"
             while !queue.empty?
               semaphore.synchronize {
                 increment_ip *(queue.pop)
@@ -31,7 +34,7 @@ module IPBlocker
           Thread.current[:name] = "collector:flush"
           loop do
             semaphore.synchronize {
-              logging "flushing cache with [#{cache.keys.size}] keys" do
+              Logger.logging "flushing cache with [#{cache.keys.size}] keys" do
                 cache.each_pair do |key, count|
                   adapter.increment_ip key[0], key[1], count
                 end

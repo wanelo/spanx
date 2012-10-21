@@ -1,9 +1,12 @@
+require 'ip-blocker/logger'
+require 'lib/ip-blocker/helper/timing'
+
 module IPBlocker
   module Redis
-
     class Adapter
+
+      include IPBlocker::Helper::Timing
       attr_accessor :resolution, :blocks_to_keep, :history
-      include IPBlocker::Helper
 
       def initialize(config)
         @resolution = config[:collector][:resolution]
@@ -35,7 +38,7 @@ module IPBlocker
       end
 
       def block_ips(blocked_ips)
-        logging "storing #{blocked_ips.size} blocked ips" do
+        Logger.logging "storing #{blocked_ips.size} blocked ips" do
           blocked_ips.each do |blocked_ip|
             redis.setex("b:#{blocked_ip.ip}", blocked_ip.period.block_ttl, nil)
           end

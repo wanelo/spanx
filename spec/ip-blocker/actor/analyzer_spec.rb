@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'timecop'
 
 describe IPBlocker::Actor::Analyzer do
-  include IPBlocker::Helper
+  include IPBlocker::Helper::Timing
 
   before do
     IPBlocker.stub(:redis).and_return(Redis.new)

@@ -1,7 +1,11 @@
+require 'ip-blocker/logger'
+require 'ip-blocker/helper/exit'
+
 module IPBlocker
   module Actor
     class Writer
-      include IPBlocker::Helper
+      include IPBlocker::Helper::Exit
+
       attr_accessor :config, :adapter
 
       def initialize config, adapter = nil
@@ -22,7 +26,7 @@ module IPBlocker
 
       def write
         ips = adapter.blocked_ips
-        logging "writing out #{ips.size} IP rules into #{@block_file}" do
+        Logger.logging "writing out #{ips.size} IP rules into #{@block_file}" do
           begin
             File.open(@block_file, "w") do |file|
               ips.sort.each do |ip|
@@ -30,8 +34,7 @@ module IPBlocker
               end
             end
           rescue Exception => e
-            log "ERROR writing to block file #{@block_file}, #{e.inspect}"
-            exit 1
+            error_exit_with_msg "ERROR writing to block file #{@block_file}, #{e.inspect}"
           end
         end
       end

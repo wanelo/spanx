@@ -2,8 +2,6 @@ require 'spec_helper'
 require 'fileutils'
 
 describe IPBlocker::Actor::Writer do
-  include IPBlocker::Helper
-
   before do
     IPBlocker.stub(:redis).and_return(Redis.new)
   end

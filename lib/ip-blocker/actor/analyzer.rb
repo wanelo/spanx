@@ -1,7 +1,11 @@
+require 'ip-blocker/logger'
+require 'ip-blocker/helper/timing'
+
 module IPBlocker
   module Actor
     class Analyzer
-      include IPBlocker::Helper
+      include IPBlocker::Helper::Timing
+
       attr_accessor :config, :adapter, :periods
 
       def initialize config
@@ -13,7 +17,7 @@ module IPBlocker
       def run
         Thread.new do
           Thread.current[:name] = "analyzer"
-          log "starting analyzer loop..."
+          Logger.log "starting analyzer loop..."
           loop do
             analyze_all_ips()
             sleep config[:analyzer][:analyze_interval]
@@ -26,7 +30,7 @@ module IPBlocker
       def analyze_all_ips
         blocked_ips = []
         ips = adapter.ips
-        logging "analyzing #{ips.size} IPs" do
+        Logger.logging "analyzing #{ips.size} IPs" do
           ips.each do |ip|
             ip_block = analyze_ip(ip)
             blocked_ips << ip_block if ip_block
