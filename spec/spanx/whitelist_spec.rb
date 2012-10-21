@@ -26,7 +26,8 @@ describe Spanx::Whitelist do
       let(:file) { "non-existent-whitelist" }
 
       it "writes an error to stderr and exits" do
-        $stderr.should_receive(:puts).with("Unable to find whitelist file at #{file}")
+        $stderr.should_receive(:puts).with("Error: Unable to find whitelist file at #{file}")
+        $stdout.should_receive(:puts)
 
         lambda {
           whitelist.patterns

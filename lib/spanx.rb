@@ -3,15 +3,17 @@ require 'spanx/version'
 require 'spanx/helper'
 require 'spanx/logger'
 require 'spanx/config'
-require 'spanx/runner'
+require 'spanx/usage'
+require 'spanx/cli'
+
 require 'spanx/actor/log_reader'
 require 'spanx/actor/collector'
 require 'spanx/actor/analyzer'
 require 'spanx/actor/writer'
-require 'spanx/blocker_cli'
-require 'spanx/analyzer_cli'
 require 'spanx/redis/adapter'
 require 'spanx/whitelist'
+
+require 'spanx/runner'
 
 module Spanx
   class SetElement < Struct.new(:ts, :count)

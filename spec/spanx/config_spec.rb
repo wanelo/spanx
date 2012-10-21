@@ -12,7 +12,8 @@ describe Spanx::Config do
     context "config file does not exist" do
       let(:file) { "non_existent_file" }
       it "should write error to stderr" do
-        $stderr.should_receive(:puts).with("Unable to find config_file at #{file}")
+        $stderr.should_receive(:puts).with("Error: Unable to find config_file at #{file}")
+        $stdout.should_receive(:puts)
         lambda {
           Spanx::Config.new(file)
         }.should raise_error(SystemExit)
