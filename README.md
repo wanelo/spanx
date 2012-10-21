@@ -22,7 +22,8 @@ Spanx uses Redis to save state and do set logic on the information it finds.
 
 ## Usage
 
-Spanx has a single executable with several sub-commands.
+Spanx has a single executable with several sub-commands. In practice, multiple commands will
+be run concurrently to do all of the necessary calculations.
 
 ### watch
 
@@ -30,15 +31,17 @@ This command watches an nginx log file and writes out blocked IPs to a file spec
 
 ```bash
 Usage: spanx watch [options]
-    -a, --analyze                 Analyze IPs (as opposed to running `spanx analyze`
-                                    in another process)
-    -b, --block_file BLOCK_FILE   Output file to store NGINX block list
+    -b, --block_file BLOCK_FILE   Output file to store NGINX block list (required in command
+                                    line options or config file)
     -c, --config CONFIG           Path to config file (YML) (required)
     -d, --daemonize
     -g, --debug                   Log stuff
-    -f, --file LOGFILE            Log file to scan continuously
+    -f, --file ACCESS_LOG         Access log file to scan continuously (required in command
+                                    line options or config file)
     -w, --whitelist WHITELIST     File containing newline separated regular expressions to
                                     exclude log lines from blocker
+    -z, --analyze                 Analyze IPs (as opposed to running `spanx analyze`
+                                    in another process)
     -h, --help                    Show this message
 ```
 
@@ -54,6 +57,24 @@ Usage: spanx analyze [options]
     -d, --daemonize
     -g, --debug                      Log status to STDOUT
     -h, --help                       Show this message
+```
+
+## Example use cases
+
+If you have only one load balancer, you may want to centralize all work into a single process, as such:
+
+```bash
+ $ spanx watch -w /path/to/whitelist -c /path/to/spanx.conf.yml -z -d
+```
+
+With multiple load balancers, this may not be desirable. All hosts will need to process their own access
+log, but a minimum number of hosts should analyze the IP traffic.
+
+```bash
+ lb1 $ spanx watch -w /path/to/whitelist -c /path/to/spanx.conf.yml -d
+ lb2 $ spanx watch -w /path/to/whitelist -c /path/to/spanx.conf.yml -d
+
+ lb2 $ spanx analyze -c /path/to/spanx.conf.yml -d
 ```
 
 ## Contributing
