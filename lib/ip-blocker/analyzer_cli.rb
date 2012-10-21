@@ -1,7 +1,7 @@
-require 'daemon'
 require 'mixlib/cli'
 require 'ip-blocker/actor/log_reader'
 require 'thread'
+require 'daemons/daemonize'
 
 module IPBlocker
   class AnalyzerCLI
@@ -40,6 +40,7 @@ module IPBlocker
 
     def run(argv = ARGV)
       generate_config(argv)
+      Daemonize.daemonize if config[:daemonize]
       IPBlocker.redis(config[:redis])
       IPBlocker::Runner.new(config).run_analyzer
     end

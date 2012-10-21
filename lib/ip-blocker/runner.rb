@@ -1,4 +1,3 @@
-require 'daemon'
 require 'mixlib/cli'
 require 'ip-blocker/actor/log_reader'
 require 'ip-blocker/whitelist'
