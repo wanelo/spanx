@@ -77,18 +77,4 @@ describe IPBlocker::Redis::Adapter do
       adapter.send(:key, "abc").should == "i:abc"
     end
   end
-
-  describe "#current_timestamp" do
-    let(:time) { DateTime.parse('2001-02-02T21:03:26+00:00').to_time }
-
-    before { time.to_i.should == 981147806 }
-
-    it "returns unix time floored to the nearest resolution block" do
-      Timecop.freeze time do
-        adapter.period_marker(resolution).should == 981147800
-        adapter.resolution = 300
-        adapter.period_marker(300).should == 981147600
-      end
-    end
-  end
 end

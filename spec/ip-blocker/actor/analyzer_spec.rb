@@ -98,7 +98,7 @@ describe IPBlocker::Actor::Analyzer do
 
   describe "#analyze_all_ips" do
     context "danger IP is found" do
-      let(:blocked_ip) { IPBlocker::BlockedIp.new(ip2, double(), 200, 1234566)}
+      let(:blocked_ip) { IPBlocker::BlockedIp.new(ip2, double(), 200, 1234566) }
 
       before do
         adapter.should_receive(:ips).and_return([ip1, ip2])
