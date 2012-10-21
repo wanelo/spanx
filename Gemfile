@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in ip-blocker.gemspec
+# Specify your gem's dependencies in spanx.gemspec
 gemspec

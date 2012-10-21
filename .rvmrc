@@ -1,1 +1,1 @@
-rvm use 1.9.3@ip-blocker --create
+rvm use 1.9.3@spanx --create

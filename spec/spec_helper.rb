@@ -7,7 +7,7 @@
 
 require 'rubygems'
 require 'bundler/setup' if File.exists?(ENV['BUNDLE_GEMFILE'])
-require 'ip-blocker'
+require 'spanx'
 
 Dir['spec/support/**/*.rb'].each { |filename| require_relative "../#{filename}" }
 
