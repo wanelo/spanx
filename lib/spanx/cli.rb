@@ -3,6 +3,7 @@ require 'spanx/helper/exit'
 
 module Spanx
   class CLI
+    include Mixlib::CLI
     include Spanx::Helper::Exit
     include Spanx::Helper::Subclassing
 
@@ -13,7 +14,7 @@ module Spanx
     def run(args = ARGV)
       @args = args
       validate!
-      self.class.subclass_class(args.shift).new.run(args)
+      Spanx::CLI.subclass_class(args.shift).new.run(args)
     end
 
 
@@ -22,8 +23,17 @@ module Spanx
     def validate!
       error_exit_with_msg("No command given") if args.empty?
       @command = args.first
-      error_exit_with_msg("No command found matching #{@command}") unless self.class.subclasses.include?(@command)
+      error_exit_with_msg("No command found matching #{@command}") unless Spanx::CLI.subclasses.include?(@command)
     end
+
+    def generate_config(argv)
+      parse_options argv
+      config.merge! Spanx::Config.new(config[:config_file])
+      parse_options argv
+
+      Spanx::Logger.enable if config[:debug]
+    end
+
   end
 end
 

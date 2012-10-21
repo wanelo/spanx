@@ -6,8 +6,6 @@ require 'spanx/runner'
 
 class Spanx::CLI::Analyze < Spanx::CLI
 
-  include Mixlib::CLI
-
   banner "Usage: spanx analyze [options]"
 
   option :daemonize,
@@ -43,16 +41,6 @@ class Spanx::CLI::Analyze < Spanx::CLI
     generate_config(argv)
     Daemonize.daemonize if config[:daemonize]
     Spanx.redis(config[:redis])
-    Spanx::Runner.new(config).run_analyzer
-  end
-
-  private
-
-  def generate_config(argv)
-    parse_options argv
-    config.merge! Spanx::Config.new(config[:config_file])
-    parse_options argv
-
-    Spanx::Logger.enable if config[:debug]
+    Spanx::Runner.new("analyzer", config).run
   end
 end

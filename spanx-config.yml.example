@@ -1,5 +1,5 @@
 ---
-:log_file: ""
+:access_log: ""
 :block_file: "block-ips.conf"
 :redis:
   :host: "127.0.0.1"

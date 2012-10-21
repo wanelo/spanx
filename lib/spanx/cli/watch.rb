@@ -5,7 +5,6 @@ require 'spanx/runner'
 
 class Spanx::CLI::Watch < Spanx::CLI
   include Spanx::Helper::Exit
-  include Mixlib::CLI
 
   banner "Usage: spanx watch [options]"
 
@@ -15,10 +14,10 @@ class Spanx::CLI::Watch < Spanx::CLI
          :boolean => true,
          :default => false
 
-  option :log_file,
-         :short => "-f LOGFILE",
-         :long => "--file LOGFILE",
-         :description => "Log file to scan continuously",
+  option :access_log,
+         :short => "-f ACCESS_LOG",
+         :long => "--file ACCESS_LOG",
+         :description => "Access log file to scan continuously (required in command line options or config file)",
          :required => false
 
   option :config_file,
@@ -44,12 +43,12 @@ class Spanx::CLI::Watch < Spanx::CLI
   option :whitelist_file,
          :short => '-w WHITELIST',
          :long => '--whitelist WHITELIST',
-         :description => 'File containing newline separated regular expressions to exclude log lines from blocker',
+         :description => 'File containing newline separated regular expressions to exclude lines from access log',
          :required => false,
          :default => nil
 
   option :analyze,
-         :short => '-a',
+         :short => '-z',
          :long => '--analyze',
          :description => 'Analyze IPs (as opposed to running `spanx analyze` in another process)',
          :boolean => true,
@@ -69,22 +68,18 @@ class Spanx::CLI::Watch < Spanx::CLI
     validate!
     Daemonize.daemonize if config[:daemonize]
     Spanx.redis(config[:redis])
-    Spanx::Runner.new(config).run
+
+    runners = %w(log_reader collector writer)
+    runners << "analyzer" if config[:analyze]
+
+    Spanx::Runner.new(*runners, config).run
   end
 
   private
 
   def validate!
-    error_exit_with_msg("Could not find file. Use -f or set :file in config_file") unless config[:log_file] && File.exists?(config[:log_file])
+    error_exit_with_msg("Could not find file. Use -f or set :file in config_file") unless config[:access_log] && File.exists?(config[:access_log])
     error_exit_with_msg("-b block_file is required") unless config[:block_file]
-  end
-
-  def generate_config(argv)
-    parse_options argv
-    config.merge! Spanx::Config.new(config[:config_file])
-    parse_options argv
-
-    Spanx::Logger.enable if config[:debug]
   end
 
 end
