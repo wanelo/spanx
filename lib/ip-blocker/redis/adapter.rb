@@ -1,5 +1,5 @@
 require 'ip-blocker/logger'
-require 'lib/ip-blocker/helper/timing'
+require 'ip-blocker/helper/timing'
 
 module IPBlocker
   module Redis

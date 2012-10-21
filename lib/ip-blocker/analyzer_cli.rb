@@ -2,7 +2,7 @@ require 'thread'
 require 'mixlib/cli'
 require 'daemons/daemonize'
 require 'ip-blocker/logger'
-require 'ip-blocker/actor/runner'
+require 'ip-blocker/runner'
 
 module IPBlocker
   class AnalyzerCLI
