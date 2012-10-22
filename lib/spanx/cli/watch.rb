@@ -6,18 +6,14 @@ require 'spanx/runner'
 class Spanx::CLI::Watch < Spanx::CLI
   include Spanx::Helper::Exit
 
-  banner "Usage: spanx watch [options]"
-
-  option :daemonize,
-         :short => "-d",
-         :long => "--daemonize",
-         :boolean => true,
-         :default => false
+  banner <<-EOF
+  Usage: spanx watch [options]
+  EOF
 
   option :access_log,
          :short => "-f ACCESS_LOG",
          :long => "--file ACCESS_LOG",
-         :description => "Access log file to scan continuously (required in command line options or config file)",
+         :description => "Apache/nginx access log file to scan continuously",
          :required => false
 
   option :config_file,
@@ -32,26 +28,39 @@ class Spanx::CLI::Watch < Spanx::CLI
          :description => 'Output file to store NGINX block list',
          :required => false
 
-  option :debug,
-         :short => '-g',
-         :long => '--debug',
-         :description => 'Log stuff',
-         :boolean => true,
-         :required => false,
-         :default => false
-
   option :whitelist_file,
          :short => '-w WHITELIST',
          :long => '--whitelist WHITELIST',
-         :description => 'File containing newline separated regular expressions to exclude lines from access log',
+         :description => 'File with newline separated reg exps, to exclude lines from access log',
          :required => false,
          :default => nil
+
+  option :run_command,
+         :short => '-r <shell command>',
+         :long => '--run <shell command>',
+         :description => 'Command to run anytime blocked ip file changes, for example "pkill -HUP nginx"',
+         :required => false
+
+  option :daemonize,
+         :short => "-d",
+         :long => "--daemonize",
+         :description => "Detach from TTY and run as a daemon",
+         :boolean => true,
+         :default => false
 
   option :analyze,
          :short => '-z',
          :long => '--analyze',
-         :description => 'Analyze IPs (as opposed to running `spanx analyze` in another process)',
+         :description => 'Analyze IPs also (as opposed to running `spanx analyze` in another process)',
          :boolean => true,
+         :default => false
+
+  option :debug,
+         :short => '-g',
+         :long => '--debug',
+         :description => 'Log to STDOUT status of execution and some time metrics',
+         :boolean => true,
+         :required => false,
          :default => false
 
   option :help,
