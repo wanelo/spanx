@@ -20,11 +20,14 @@ module Spanx
         Thread.new do
           Thread.current[:name] = "collector:queue"
           loop do
-            Logger.log "#{queue.size} IPs on the queue"
-            while !queue.empty?
-              semaphore.synchronize {
-                increment_ip *(queue.pop)
-              }
+            unless queue.empty?
+              Logger.logging "caching [#{queue.size}] keys locally" do
+                while !queue.empty?
+                  semaphore.synchronize {
+                    increment_ip *(queue.pop)
+                  }
+                end
+              end
             end
             sleep 1
           end

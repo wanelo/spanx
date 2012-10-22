@@ -33,11 +33,11 @@ module Spanx
         start = Time.now
         returned_from_block = yield
         elapsed_time = Time.now - start
-        log "#{message} (elapsed: #{"%.2f" % (1000 * elapsed_time)}ms)"
+        log "(#{"%9.2f" % (1000 * elapsed_time)}ms) #{message}"
         returned_from_block
       rescue Exception => e
         elapsed_time = Time.now - start
-        log "error: #{e.message} for #{message} (elapsed: #{"%.1f" % (1000 * elapsed_time)}ms)"
+        log "(#{"%9.2f" % (1000 * elapsed_time)}ms) error: #{e.message} for #{message} "
       end
     end
   end

@@ -28,6 +28,12 @@ class Spanx::CLI::Analyze < Spanx::CLI
          :required => false,
          :default => false
 
+  option :audit_file,
+         :short => '-a AUDIT',
+         :long  => '--audit AUDIT_FILE',
+         :description => 'Historical record of IP blocking decisions',
+         :required => false
+
   option :help,
          :short => "-h",
          :long => "--help",

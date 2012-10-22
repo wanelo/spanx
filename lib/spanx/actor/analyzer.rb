@@ -12,6 +12,7 @@ module Spanx
         @config = config
         @adapter = Spanx::Redis::Adapter.new(config)
         @periods = Spanx::PeriodCheck.from_config(config)
+        @audit_file = config[:audit_file]
       end
 
       def run
@@ -36,7 +37,22 @@ module Spanx
             blocked_ips << ip_block if ip_block
           end
         end
-        adapter.block_ips(blocked_ips)
+        unless blocked_ips.empty?
+          if @audit_file
+            begin
+              currently_blocked_ips = adapter.blocked_ips
+              File.open(@audit_file, "a") do |file|
+                file.puts "#{Time.now} ------------- new blocked IPs not previously recorded ------------"
+                blocked_ips.reject { |b| currently_blocked_ips.include?(b.ip) }.each do |b|
+                  file.puts "#{Time.now} -- #{sprintf("%-16s", b.ip)} period=#{b.period.period_seconds} max=#{b.period.max_allowed} count=#{b.count} ttl=#{b.period.block_ttl}"
+                end
+              end
+            rescue Exception => e
+              Logger.log "error writing to audit file: #{e.inspect}"
+            end
+          end
+          adapter.block_ips(blocked_ips)
+        end
       end
 
       # Analyze individual IP for all defined periods.  As soon as one

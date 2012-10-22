@@ -17,7 +17,6 @@ module Spanx
       Spanx::CLI.subclass_class(args.shift).new.run(args)
     end
 
-
     private
 
     def validate!
@@ -30,6 +29,10 @@ module Spanx
       parse_options argv
       config.merge! Spanx::Config.new(config[:config_file])
       parse_options argv
+
+      if config[:debug]
+        STDOUT.sync = true
+      end
 
       Spanx::Logger.enable if config[:debug]
     end

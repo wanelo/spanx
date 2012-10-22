@@ -15,13 +15,13 @@
   :analyze_interval: 20
   :period_checks:
     - :period_seconds: 3600
-      :max_allowed: 3600
+      :max_allowed: 2000
       :block_ttl: 7200
     - :period_seconds: 600
       :max_allowed: 600
       :block_ttl: 1200
     - :period_seconds: 21600
-      :max_allowed: 10000
-      :block_ttl: 431200
+      :max_allowed: 8000
+      :block_ttl: 64800
 :writer:
   :write_interval: 10
