@@ -27,23 +27,21 @@ module Spanx
 
       def write
         ips = adapter.blocked_ips
-        unless ips.empty?
-          Logger.logging "writing out [#{ips.size}] IP block rules to [#{@block_file}]" do
-            begin
-              contents_previous = File.read(@block_file) rescue nil
-              File.open(@block_file, "w") do |file|
-                ips.sort.each do |ip|
-                  # TODO: make this a customizable ERB template
-                  file.puts("deny #{ip};")
-                end
+        Logger.logging "writing out [#{ips.size}] IP block rules to [#{@block_file}]" do
+          begin
+            contents_previous = File.read(@block_file) rescue nil
+            File.open(@block_file, "w") do |file|
+              ips.sort.each do |ip|
+                # TODO: make this a customizable ERB template
+                file.puts("deny #{ip};")
               end
-              contents_now = File.read(@block_file)
-              if contents_now != contents_previous && @run_command
-                run_command()
-              end
-            rescue Exception => e
-              error_exit_with_msg "ERROR writing to block file #{@block_file} or running command: #{e.inspect}"
             end
+            contents_now = File.read(@block_file)
+            if contents_now != contents_previous && @run_command
+              run_command()
+            end
+          rescue Exception => e
+            error_exit_with_msg "ERROR writing to block file #{@block_file} or running command: #{e.inspect}"
           end
         end
       end
