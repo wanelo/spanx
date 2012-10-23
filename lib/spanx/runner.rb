@@ -30,6 +30,7 @@ module Spanx
       @queue = Queue.new
       validate_args!(args)
       @actors = args.map { |actor| self.send(actor.to_sym) }
+      STDOUT.sync = true if config[:debug]
     end
 
     def run
