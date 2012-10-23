@@ -33,6 +33,9 @@ module Spanx
         start = Time.now
         returned_from_block = yield
         elapsed_time = Time.now - start
+        if returned_from_block.is_a?(String) && returned_from_block != ""
+          message += " - #{returned_from_block}"
+        end
         log "(#{"%9.2f" % (1000 * elapsed_time)}ms) #{message}"
         returned_from_block
       rescue Exception => e
