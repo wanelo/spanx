@@ -5,12 +5,13 @@ module Spanx
     # Notify Campfire room of a new IP blocked
     class Campfire < Base
 
-      attr_accessor :enabled, :account, :room_id, :token
+      attr_accessor :account, :room_id, :token
 
       def initialize(config)
         @enabled = config[:campfire][:enabled]
-        return unless @enabled
-        _init(config[:campfire][:account], config[:campfire][:room_id], config[:campfire][:token])
+        if self.enabled?
+          _init(config[:campfire][:account], config[:campfire][:room_id], config[:campfire][:token])
+        end
       end
 
       def _init(account, room_id, token)
@@ -20,7 +21,11 @@ module Spanx
       end
 
       def ip_blocked(blocked_ip)
-        speak generate_block_ip_message(blocked_ip) unless enabled
+        speak generate_block_ip_message(blocked_ip) if enabled?
+      end
+
+      def enabled?
+        @enabled
       end
 
       private
@@ -42,7 +47,7 @@ module Spanx
         violated_period = blocked_ip.period
         "#{blocked_ip.ip} blocked @ #{Time.at(blocked_ip.time_blocked)} " \
           "for #{violated_period.block_ttl/60}mins, for #{blocked_ip.count} requests over " \
-          "#{violated_period.period_seconds/60}mins, max allowed #{violated_period.max_allowed/60}mins"
+          "#{violated_period.period_seconds/60}mins, with #{violated_period.max_allowed} allowed."
       end
     end
   end
