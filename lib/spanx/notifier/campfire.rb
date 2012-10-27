@@ -8,7 +8,7 @@ module Spanx
       attr_accessor :enabled, :account, :room_id, :token
 
       def initialize(config)
-        @enabled = config[:config][:enabled]
+        @enabled = config[:campfire][:enabled]
         return unless @enabled
         _init(config[:campfire][:account], config[:campfire][:room_id], config[:campfire][:token])
       end
