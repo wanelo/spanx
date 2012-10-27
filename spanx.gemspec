@@ -19,6 +19,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'mixlib-cli'
   gem.add_dependency 'daemons'
   gem.add_dependency 'redis'
+  gem.add_dependency 'tinder'
 
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'fakeredis'

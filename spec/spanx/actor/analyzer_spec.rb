@@ -4,6 +4,7 @@ require 'timecop'
 describe Spanx::Actor::Analyzer do
   include Spanx::Helper::Timing
 
+
   before do
     Spanx.stub(:redis).and_return(Redis.new)
   end
@@ -11,20 +12,26 @@ describe Spanx::Actor::Analyzer do
   let(:analyzer) { Spanx::Actor::Analyzer.new(config) }
   let(:config) {
     {
-        analyzer: {period_checks: periods, block_timeout: 50},
-        collector: {resolution: 10, history: 100}
+        analyzer: {period_checks: periods, block_timeout: 50, blocked_ip_notifiers: [ "Spanx::Notifier::Campfire" ]},
+        collector: {resolution: 10, history: 100},
+        campfire: {
+            enabled: true,
+            room_id: 1111,
+            token: 'aaffdfsdfadfasdfasdfasdf',
+            account: "test"
+        }
     }
   }
   let(:periods) {
     [
-        {period_seconds: 10, max_allowed: 2},
-        {period_seconds: 30, max_allowed: 3}
+        {period_seconds: 10, max_allowed: 2, block_ttl: 20},
+        {period_seconds: 30, max_allowed: 3, block_ttl: 20}
     ]
   }
   let (:period_structs) do
     [
-        Spanx::PeriodCheck.new(10, 2),
-        Spanx::PeriodCheck.new(30, 3)
+        Spanx::PeriodCheck.new(10, 2, 20),
+        Spanx::PeriodCheck.new(30, 3, 20)
     ]
   end
 
@@ -94,11 +101,36 @@ describe Spanx::Actor::Analyzer do
         analyzer.analyze_ip(ip1).should be_nil
       end
     end
+
+    context "notifier" do
+      before do
+        Spanx::Notifier::Campfire.any_instance.stub(:enabled).and_return(true)
+      end
+
+      it "is invoked when IP is blocked" do
+        analyzer.notifiers.size.should eql(1)
+
+        campfire = analyzer.notifiers.first
+        campfire.should_receive(:ip_blocked)
+
+        adapter.increment_ip(ip1, now - 5, 2)
+        adapter.increment_ip(ip1, now - 15, 1)
+
+        adapter.ip_history(ip1).should_not be_empty
+        adapter.ip_history(ip1).size.should eql(2)
+
+        blocked_ips = analyzer.analyze_all_ips
+        blocked_ips.should_not be_empty
+        blocked_ips.first.ip.should eql(ip1)
+        blocked_ips.first.period.should eql(period_structs[0])
+      end
+    end
   end
 
   describe "#analyze_all_ips" do
     context "danger IP is found" do
-      let(:blocked_ip) { Spanx::BlockedIp.new(ip2, double(), 200, 1234566) }
+      let(:period_check) { double(period_seconds: 1, max_allowed: 1, block_ttl: nil) }
+      let(:blocked_ip) { Spanx::BlockedIp.new(ip2, period_check, 200, 1234566) }
 
       before do
         adapter.should_receive(:ips).and_return([ip1, ip2])
@@ -107,7 +139,7 @@ describe Spanx::Actor::Analyzer do
       end
 
       it "blocks the IP" do
-        adapter.should_receive(:block_ips).with([blocked_ip])
+        adapter.should_receive(:block_ips).with([blocked_ip]).any_number_of_times
         analyzer.analyze_all_ips
       end
     end

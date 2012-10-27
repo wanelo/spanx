@@ -38,7 +38,7 @@ class Spanx::CLI::Watch < Spanx::CLI
   option :run_command,
          :short => '-r <shell command>',
          :long => '--run <shell command>',
-         :description => 'Command to run anytime blocked ip file changes, for example "pkill -HUP nginx"',
+         :description => 'Shell command to run anytime blocked ip file changes, for example "sudo pkill -HUP nginx"',
          :required => false
 
   option :daemonize,

@@ -5,6 +5,9 @@ require 'spanx/logger'
 require 'spanx/config'
 require 'spanx/usage'
 require 'spanx/cli'
+require 'spanx/notifier/base'
+require 'spanx/notifier/campfire'
+require 'spanx/notifier/audit_log'
 
 require 'spanx/actor/log_reader'
 require 'spanx/actor/collector'
@@ -41,5 +44,18 @@ module Spanx
     def redis(config = nil)
       @redis ||= ::Redis.new(host: config[:host], port: config[:port], db: config[:db])
     end
+
   end
 end
+
+class String
+  def constantize
+    camel_cased_word = self
+    unless /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/ =~ camel_cased_word
+      raise NameError, "#{camel_cased_word.inspect} is not a valid constant name!"
+    end
+
+    Object.module_eval("::#{$1}", __FILE__, __LINE__)
+  end
+end
+

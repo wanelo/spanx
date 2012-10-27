@@ -1,18 +1,23 @@
 require 'spanx/logger'
 require 'spanx/helper/timing'
+require 'spanx/notifier/base'
+require 'spanx/notifier/campfire'
+require 'spanx/notifier/audit_log'
 
 module Spanx
   module Actor
     class Analyzer
       include Spanx::Helper::Timing
 
-      attr_accessor :config, :adapter, :periods
+      attr_accessor :config, :adapter, :periods, :notifiers
 
       def initialize config
         @config = config
         @adapter = Spanx::Redis::Adapter.new(config)
         @periods = Spanx::PeriodCheck.from_config(config)
         @audit_file = config[:audit_file]
+        @notifiers = []
+        initialize_notifiers(config) if config[:analyzer][:blocked_ip_notifiers]
       end
 
       def run
@@ -29,30 +34,32 @@ module Spanx
       # Look through every IP on the stack. IPs that fulfill a PeriodCheck
       # are pushed onto a redis block list.
       def analyze_all_ips
-        blocked_ips = []
+        blocked_ip_structs = []
         ips = adapter.ips
-        Logger.logging "analyzing #{ips.size} IPs" do
+
+        Logger.logging "analyzed #{ips.size} IPs" do
           ips.each do |ip|
             ip_block = analyze_ip(ip)
-            blocked_ips << ip_block if ip_block
+            blocked_ip_structs << ip_block if ip_block
           end
         end
-        unless blocked_ips.empty?
-          if @audit_file
-            begin
-              currently_blocked_ips = adapter.blocked_ips
-              File.open(@audit_file, "a") do |file|
-                file.puts "#{Time.now} ------------- new blocked IPs not previously recorded ------------"
-                blocked_ips.reject { |b| currently_blocked_ips.include?(b.ip) }.each do |b|
-                  file.puts "#{Time.now} -- #{sprintf("%-16s", b.ip)} period=#{b.period.period_seconds} max=#{b.period.max_allowed} count=#{b.count} ttl=#{b.period.block_ttl}"
+
+        unless blocked_ip_structs.empty?
+          unless notifiers.empty?
+            currently_blocked_ips = adapter.blocked_ips
+            blocked_ip_structs.reject { |b| currently_blocked_ips.include?(b.ip) }.each do |blocked_ip|
+              self.notifiers.each do |notifier|
+                begin
+                  notifier.ip_blocked(blocked_ip)
+                rescue => e
+                  Logger.log "error notifying #{notifier.inspect} about blocked IP #{blocked_ip}: #{e.inspect}"
                 end
               end
-            rescue Exception => e
-              Logger.log "error writing to audit file: #{e.inspect}"
             end
           end
-          adapter.block_ips(blocked_ips)
+          adapter.block_ips(blocked_ip_structs)
         end
+        blocked_ip_structs
       end
 
       # Analyze individual IP for all defined periods.  As soon as one
@@ -73,6 +80,25 @@ module Spanx
         end
         nil
       end
+
+      private
+
+      def initialize_notifiers(config)
+        notifiers_to_initialize = config[:analyzer][:blocked_ip_notifiers]
+        notifiers_to_initialize.each do |class_name|
+          Logger.logging "instantiating notifier #{class_name}" do
+            begin
+              notifier = class_name.constantize.new(config)
+              self.notifiers << notifier
+            rescue => e
+              Logger.log "error instantiating #{class_name}: #{e.inspect}, notifier disabled."
+            end
+          end
+        end
+
+      end
     end
+
+
   end
 end

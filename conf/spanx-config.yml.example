@@ -13,6 +13,9 @@
   :tail_interval: 1
 :analyzer:
   :analyze_interval: 20
+  :blocked_ip_notifiers:
+    - "Spanx::Notifier::AuditLog"
+    - "Spanx::Notifier::Campfire"
   :period_checks:
     - :period_seconds: 3600
       :max_allowed: 2000
@@ -25,3 +28,8 @@
       :block_ttl: 64800
 :writer:
   :write_interval: 10
+:campfire:
+  :enabled: true
+  :room_id: 1111
+  :token: aaffdfsdfadfasdfasdfasdf
+  :account: test
