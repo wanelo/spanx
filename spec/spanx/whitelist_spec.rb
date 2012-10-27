@@ -55,5 +55,12 @@ describe Spanx::Whitelist do
       end
     end
 
+    context "users/me matches" do
+      let(:log) { %Q{66.249.73.24 - - [18/Oct/2012:03:25:33 -0700] GET /users/me HTTP/1.1 "200" 3943 "-" "-" "Mozilla/5.0 }  }
+      it "excludes users/me" do
+        whitelist.match?(log).should be_true
+      end
+    end
+
   end
 end
