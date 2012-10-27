@@ -30,6 +30,10 @@ module Spanx
       @queue = Queue.new
       validate_args!(args)
       @actors = args.map { |actor| self.send(actor.to_sym) }
+
+      Spanx.redis(config[:redis]) if config[:redis]
+      Daemonize.daemonize if config[:daemonize]
+
       STDOUT.sync = true if config[:debug]
     end
 

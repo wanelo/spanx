@@ -121,8 +121,11 @@ describe Spanx::Actor::Analyzer do
 
         blocked_ips = analyzer.analyze_all_ips
         blocked_ips.should_not be_empty
-        blocked_ips.first.ip.should eql(ip1)
-        blocked_ips.first.period.should eql(period_structs[0])
+        bip = blocked_ips.first
+        bip.ip.should eql(ip1)
+        bip.period.should eql(period_structs[0])
+        message = campfire.send(:generate_block_ip_message, bip)
+        message.include?(ip1).should be_true
       end
     end
   end

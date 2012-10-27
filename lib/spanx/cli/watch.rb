@@ -75,9 +75,6 @@ class Spanx::CLI::Watch < Spanx::CLI
   def run(argv = ARGV)
     generate_config(argv)
     validate!
-    Daemonize.daemonize if config[:daemonize]
-    Spanx.redis(config[:redis])
-
     runners = %w(log_reader collector writer)
     runners << "analyzer" if config[:analyze]
 

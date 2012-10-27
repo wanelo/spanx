@@ -45,8 +45,6 @@ class Spanx::CLI::Analyze < Spanx::CLI
 
   def run(argv = ARGV)
     generate_config(argv)
-    Daemonize.daemonize if config[:daemonize]
-    Spanx.redis(config[:redis])
     Spanx::Runner.new("analyzer", config).run
   end
 end

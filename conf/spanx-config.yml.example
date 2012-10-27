@@ -1,6 +1,7 @@
 ---
 :access_log: ""
 :block_file: "block-ips.conf"
+:audit_file: "spanx-audit.log"
 :redis:
   :host: "127.0.0.1"
   :port: 6379

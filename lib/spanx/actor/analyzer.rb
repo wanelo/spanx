@@ -45,18 +45,7 @@ module Spanx
         end
 
         unless blocked_ip_structs.empty?
-          unless notifiers.empty?
-            currently_blocked_ips = adapter.blocked_ips
-            blocked_ip_structs.reject { |b| currently_blocked_ips.include?(b.ip) }.each do |blocked_ip|
-              self.notifiers.each do |notifier|
-                begin
-                  notifier.ip_blocked(blocked_ip)
-                rescue => e
-                  Logger.log "error notifying #{notifier.inspect} about blocked IP #{blocked_ip}: #{e.inspect}"
-                end
-              end
-            end
-          end
+          call_notifiers(blocked_ip_structs)
           adapter.block_ips(blocked_ip_structs)
         end
         blocked_ip_structs
@@ -95,8 +84,23 @@ module Spanx
             end
           end
         end
-
       end
+
+      def call_notifiers(blocked_ip_structs)
+        unless notifiers.empty?
+          currently_blocked_ips = adapter.blocked_ips
+          blocked_ip_structs.reject { |b| currently_blocked_ips.include?(b.ip) }.each do |blocked_ip|
+            self.notifiers.each do |notifier|
+              begin
+                notifier.ip_blocked(blocked_ip)
+              rescue => e
+                Logger.log "error notifying #{notifier.inspect} about blocked IP #{blocked_ip}: #{e.inspect}"
+              end
+            end
+          end
+        end
+      end
+
     end
 
 
