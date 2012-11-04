@@ -18,7 +18,7 @@ module Spanx
           Thread.current[:name] = "log_reader"
           Logger.log "tailing the log file #{file.path}...."
           self.read do |line|
-            queue << [ extract_ip(line), Time.now.to_i ]
+            queue << [line, Time.now.to_i ] if line
           end
         end
       end
