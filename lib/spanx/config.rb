@@ -1,15 +1,14 @@
 require 'yaml'
-require 'mash'
 require 'spanx/helper/exit'
 
 module Spanx
-  class Config < Mash
+  class Config < Hash
     include Spanx::Helper::Exit
 
     attr_accessor :filename
 
     def initialize(filename)
-      super({})
+      super
       @filename = filename
       load_file
       self
