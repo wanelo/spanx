@@ -63,10 +63,12 @@ describe Spanx::Notifier::Email, "#publish" do
 
   context "when enabled" do
     let(:email_content) { "blocked email message" }
+    let(:email_subject) { nil }
     let(:config) { {
         email: {
             to: "you@you.com",
-            from: "me@me.com"
+            from: "me@me.com",
+            subject: email_subject
         }
     } }
 
@@ -74,15 +76,30 @@ describe Spanx::Notifier::Email, "#publish" do
       Spanx::Notifier::Email.any_instance.stub(:enabled?).and_return(true)
       Spanx::Notifier::Email.any_instance.stub(:generate_block_ip_message).and_return(email_content)
       subject.publish(blocked_ip)
+      subject.thread.join
     }
 
-    it {
-      should have_sent_email.
-                 to("you@you.com").
-                 from("me@me.com").
-                 with_body(email_content).
-                 with_subject("IP Blocked: 1.2.3.4")
-    }
+    context "with email subject" do
+      let(:email_subject) { "OMG It's an email!" }
+
+      it {
+        should have_sent_email.
+                   to("you@you.com").
+                   from("me@me.com").
+                   with_body(email_content).
+                   with_subject("OMG It's an email! 1.2.3.4")
+      }
+    end
+
+    context "without a subject line" do
+      it {
+        should have_sent_email.
+                   to("you@you.com").
+                   from("me@me.com").
+                   with_body(email_content).
+                   with_subject("IP Blocked: 1.2.3.4")
+      }
+    end
   end
 end
 

@@ -4,7 +4,7 @@ module Spanx
   module Notifier
     class Email < Base
 
-      attr_reader :config
+      attr_reader :config, :thread
 
       def initialize(config)
         @config = config[:email]
@@ -15,13 +15,18 @@ module Spanx
       def publish(blocked_ip)
         return unless enabled?
 
-        mail = Mail.new
-        mail.to = config[:to]
-        mail.from = config[:from]
-        mail.subject = subject(blocked_ip)
-        mail.body = generate_block_ip_message(blocked_ip)
+        @thread = Thread.new do
+          Thread.current[:name] = "email notifier"
+          Logger.log "sending notification email for #{blocked_ip.ip}"
 
-        mail.deliver
+          mail = Mail.new
+          mail.to = config[:to]
+          mail.from = config[:from]
+          mail.subject = subject(blocked_ip)
+          mail.body = generate_block_ip_message(blocked_ip)
+
+          mail.deliver
+        end
       end
 
       def enabled?
@@ -31,7 +36,7 @@ module Spanx
       private
 
       def subject(blocked_ip)
-        "IP Blocked: #{blocked_ip.ip}"
+        "#{config[:subject] || "IP Blocked:"} #{blocked_ip.ip}"
       end
 
       def configure_email_gateway
