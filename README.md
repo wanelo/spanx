@@ -39,9 +39,9 @@ If you have multiple web servers, you need to run watcher on each server, and an
 ### Alerts
 
 Besides actually writing out IPs to a block list file, Spanx supports notifiers that will be called when a new IP
-is blocked.  Currently supported are audit log notifier (that writes that information to a log file), and a Campfire
-Chat notifier, which will print IP blocking information into your Campfire chat room. It is very easy to write
-additional notifiers.
+is blocked.  Currently supported are audit log notifier (that writes that information to a log file), a Campfire
+Chat notifier, which will print IP blocking information into your Campfire chat room, and an Email notifier. It is
+very easy to write additional notifiers.
 
 ## Installation
 

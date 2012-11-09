@@ -17,6 +17,7 @@
   :blocked_ip_notifiers:
     - "Spanx::Notifier::AuditLog"
     - "Spanx::Notifier::Campfire"
+    - "Spanx::Notifier::Email"
   :period_checks:
     - :period_seconds: 3600
       :max_allowed: 2000
@@ -34,3 +35,10 @@
   :room_id: 1111
   :token: aaffdfsdfadfasdfasdfasdf
   :account: test
+:email:
+  :enabled: true
+  :to: "everyone@mycompany.com"
+  :from: "spanx@mycompany.com"
+  :password: "s3cVr3p4ssw0rd"
+  :domain: "mycompany.com"
+  :gateway: "smtp.gmail.com"

@@ -3,6 +3,7 @@ require 'spanx/helper/timing'
 require 'spanx/notifier/base'
 require 'spanx/notifier/campfire'
 require 'spanx/notifier/audit_log'
+require 'spanx/notifier/email'
 
 module Spanx
   module Actor

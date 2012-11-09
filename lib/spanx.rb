@@ -8,6 +8,7 @@ require 'spanx/cli'
 require 'spanx/notifier/base'
 require 'spanx/notifier/campfire'
 require 'spanx/notifier/audit_log'
+require 'spanx/notifier/email'
 
 require 'spanx/actor/log_reader'
 require 'spanx/actor/collector'
