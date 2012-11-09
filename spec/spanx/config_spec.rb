@@ -9,6 +9,14 @@ describe Spanx::Config do
       config[:redis][:database].should == 1
     end
 
+    it "permits hash access via strings or symbols" do
+      config = Spanx::Config.new("spec/fixtures/config.yml")
+      config[:string_key] = "string value"
+      config["string_key"] = "string value"
+      config[:symbol_key] = "symbol value"
+      config["symbol_key"] = "symbol value"
+    end
+
     context "config file does not exist" do
       let(:file) { "non_existent_file" }
       it "should write error to stderr" do

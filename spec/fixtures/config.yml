@@ -3,3 +3,5 @@
   :host: "127.0.0.1"
   :port: 6380
   :database: 1
+:symbol_key: "symbol value"
+string_key: "string value"

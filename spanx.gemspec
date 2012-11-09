@@ -19,6 +19,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'mixlib-cli'
   gem.add_dependency 'daemons'
   gem.add_dependency 'redis'
+  gem.add_dependency 'mash'
   gem.add_dependency 'tinder'
   gem.add_dependency 'mail', '~> 2.4.4'
 
