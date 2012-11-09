@@ -14,14 +14,14 @@ module Spanx
         end
       end
 
+      def publish(blocked_ip)
+        speak generate_block_ip_message(blocked_ip) if enabled?
+      end
+
       def _init(account, room_id, token)
         @account = account
         @room_id = room_id
         @token = token
-      end
-
-      def ip_blocked(blocked_ip)
-        speak generate_block_ip_message(blocked_ip) if enabled?
       end
 
       def enabled?

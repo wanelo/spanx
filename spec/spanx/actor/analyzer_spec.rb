@@ -111,7 +111,7 @@ describe Spanx::Actor::Analyzer do
         analyzer.notifiers.size.should eql(1)
 
         campfire = analyzer.notifiers.first
-        campfire.should_receive(:ip_blocked)
+        campfire.should_receive(:publish)
 
         adapter.increment_ip(ip1, now - 5, 2)
         adapter.increment_ip(ip1, now - 15, 1)

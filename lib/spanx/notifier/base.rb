@@ -2,9 +2,10 @@ module Spanx
   module Notifier
     class Base
 
-      # an instance of the Spanx::BlockedIp struct
-      def ip_blocked(blocked_ip)
-        raise 'Not Implemented'
+      # Takes an instance of the Spanx::BlockedIp struct.
+      # Overwrite this a subclass to define real behavior
+      def publish(blocked_ip)
+        raise 'Abstrace Method Not Implemented'
       end
 
       protected

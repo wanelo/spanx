@@ -92,7 +92,7 @@ module Spanx
           blocked_ip_structs.reject { |b| currently_blocked_ips.include?(b.ip) }.each do |blocked_ip|
             self.notifiers.each do |notifier|
               begin
-                notifier.ip_blocked(blocked_ip)
+                notifier.publish(blocked_ip)
               rescue => e
                 Logger.log "error notifying #{notifier.inspect} about blocked IP #{blocked_ip}: #{e.inspect}"
               end
@@ -100,9 +100,6 @@ module Spanx
           end
         end
       end
-
     end
-
-
   end
 end
