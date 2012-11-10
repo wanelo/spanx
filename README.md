@@ -103,6 +103,19 @@ Usage: [bundle exec] spanx analyze [options]
     -h, --help                       Show this message
 ```
 
+### flush
+
+This removes the persistence data around current IP blocks. Use this
+when you want to remove all data around current blocks without (or in
+addition to) disabling the blocker.
+
+```bash
+Usage: [bundle exec] spanx flush [options]
+    -c, --config CONFIG              Path to config file (YML) (required)
+    -g, --debug                      Log status to STDOUT
+    -h, --help                       Show this message
+```
+
 ## Examples
 
 If you have only one load balancer, you may want to centralize all work into a single process, as such:

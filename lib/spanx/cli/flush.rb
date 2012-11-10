@@ -1,9 +1,9 @@
 require 'mixlib/cli'
 require 'spanx/logger'
 
-class Spanx::CLI::Analyze < Spanx::CLI
+class Spanx::CLI::Flush < Spanx::CLI
 
-  banner "Usage: spanx clean [options]"
+  banner "Usage: spanx flush [options]"
 
   option :config_file,
          :short => '-c CONFIG',
