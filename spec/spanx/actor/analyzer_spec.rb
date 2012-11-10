@@ -131,6 +131,18 @@ describe Spanx::Actor::Analyzer do
   end
 
   describe "#analyze_all_ips" do
+    context "adapter is disabled" do
+      before do
+        adapter.stub(:ips).and_return([ip1, ip2])
+        adapter.stub(:enabled?).and_return(false)
+        analyzer.should_not_receive(:analyze_ip)
+      end
+
+      it "does nothing" do
+        analyzer.analyze_all_ips
+      end
+    end
+
     context "danger IP is found" do
       let(:period_check) { double(period_seconds: 1, max_allowed: 1, block_ttl: nil) }
       let(:blocked_ip) { Spanx::BlockedIp.new(ip2, period_check, 200, 1234566) }

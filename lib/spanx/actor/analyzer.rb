@@ -35,6 +35,8 @@ module Spanx
       # Look through every IP on the stack. IPs that fulfill a PeriodCheck
       # are pushed onto a redis block list.
       def analyze_all_ips
+        return unless adapter.enabled?
+
         blocked_ip_structs = []
         ips = adapter.ips
 

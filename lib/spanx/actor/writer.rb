@@ -26,7 +26,13 @@ module Spanx
       end
 
       def write
-        ips = adapter.enabled? ? adapter.blocked_ips : []
+        if adapter.enabled?
+          ips = adapter.blocked_ips
+        else
+          Logger.log "writing empty block file due to disabled state"
+          ips = []
+        end
+
         begin
           contents_previous = File.read(@block_file) rescue nil
           Logger.logging "writing out [#{ips.size}] IP block rules to [#{@block_file}]" do
