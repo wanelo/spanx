@@ -6,9 +6,10 @@ module Spanx
     class Adapter
 
       include Spanx::Helper::Timing
-      attr_accessor :resolution, :blocks_to_keep, :history
+      attr_accessor :resolution, :blocks_to_keep, :history, :config
 
       def initialize(config)
+        @config = config
         @resolution = config[:collector][:resolution]
         @blocks_to_keep = config[:collector][:history] / @resolution
         @history = config[:collector][:history]
@@ -49,6 +50,11 @@ module Spanx
         blocked_keys.map { |key| ip(key) }
       end
 
+      def unblock_all
+        redis.del blocked_ips.map{ |ip| key(ip) }
+        redis.del blocked_keys
+      end
+
       private
 
       def ip(key)
@@ -56,7 +62,7 @@ module Spanx
       end
 
       def redis
-        Spanx.redis
+        Spanx.redis(config)
       end
 
       def get(key)

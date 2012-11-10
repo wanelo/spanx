@@ -77,4 +77,28 @@ describe Spanx::Redis::Adapter do
       adapter.send(:key, "abc").should == "i:abc"
     end
   end
+
+  describe "#unblock_all" do
+    before do
+      adapter.increment_ip("1.2.3.4", 1234)
+      adapter.increment_ip("5.6.7.8", 1234)
+
+      redis.keys("i:1.2.3.4").should_not be_empty
+      redis.keys("i:5.6.7.8").should_not be_empty
+
+      adapter.block_ips([mock(ip:"5.6.7.8", period:mock(block_ttl:10))])
+      redis.keys("b:5.6.7.8").should_not be_empty
+
+      adapter.unblock_all
+    end
+
+    it "removes all blocked ips" do
+      redis.keys("b:*").should be_empty
+    end
+
+    it "removes redis keys for blocked ips" do
+      redis.keys("i:1.2.3.4").should_not be_empty
+      redis.keys("i:5.6.7.8").should be_empty
+    end
+  end
 end
