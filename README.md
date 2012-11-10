@@ -103,6 +103,32 @@ Usage: [bundle exec] spanx analyze [options]
     -h, --help                       Show this message
 ```
 
+### disable
+
+Disables IP blocking. Note that this only effects the actual writing out
+of block files, not of IP tracking or analysis. Note that this requires
+a connection to redis, and thus requires the same config file used in
+`analyze` and `watch`.
+
+```bash
+Usage: [bundle exec] spanx disable [options]
+    -c, --config CONFIG              Path to config file (YML) (required)
+    -g, --debug                      Log status to STDOUT
+    -h, --help                       Show this message
+```
+
+### disable
+
+Reenables IP blocking if disabled. As with `disable`, the config file is
+required to connect to redis.
+
+```bash
+Usage: [bundle exec] spanx enable [options]
+    -c, --config CONFIG              Path to config file (YML) (required)
+    -g, --debug                      Log status to STDOUT
+    -h, --help                       Show this message
+```
+
 ### flush
 
 This removes the persistence data around current IP blocks. Use this

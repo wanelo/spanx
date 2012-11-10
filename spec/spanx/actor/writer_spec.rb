@@ -13,15 +13,29 @@ describe Spanx::Actor::Writer do
       block_file: "/tmp/block_file.#{$$}",
     }}
     let(:writer) { Spanx::Actor::Writer.new(config, adapter)}
-    let(:adapter) { mock(blocked_ips: ["1.2.3.4", "127.0.0.1"])}
+
     after do
       ::FileUtils.rm(config[:block_file])
     end
 
-    it "properly writes IP block file" do
-      writer.write
-      contents = File.read(config[:block_file])
-      contents.should == "deny 1.2.3.4;\ndeny 127.0.0.1;\n"
+    context "when adapter is enabled" do
+      let(:adapter) { mock(blocked_ips: ["1.2.3.4", "127.0.0.1"], enabled?: true)}
+
+      it "properly writes IP block file" do
+        writer.write
+        contents = File.read(config[:block_file])
+        contents.should == "deny 1.2.3.4;\ndeny 127.0.0.1;\n"
+      end
+    end
+
+    context "when adapter is disabled" do
+      let(:adapter) { mock(blocked_ips: ["1.2.3.4", "127.0.0.1"], enabled?: false)}
+
+      it "writes an empty IP block file" do
+        writer.write
+        contents = File.read(config[:block_file])
+        contents.should == ""
+      end
     end
   end
 

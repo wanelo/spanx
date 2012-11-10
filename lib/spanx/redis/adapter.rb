@@ -15,7 +15,28 @@ module Spanx
         @history = config[:collector][:history]
       end
 
+      # enabled state
+      #
+      def disable
+        Logger.log "disabling IP blocking"
+        redis.set(DISABLED_KEY, 1)
+      end
 
+      def enable
+        Logger.log "enabling IP blocking"
+        redis.del(DISABLED_KEY)
+      end
+
+      def disabled?
+        ! enabled?
+      end
+
+      def enabled?
+        redis.keys(DISABLED_KEY).first.nil?
+      end
+
+      # ip management
+      #
       def increment_ip(ip, timestamp, count = 1)
         k = key(ip)
         redis.multi do |redis|
@@ -57,6 +78,8 @@ module Spanx
 
       private
 
+      DISABLED_KEY = "spanx:disabled"
+
       def ip(key)
         key.gsub(/^(i|b):/, '')
       end
@@ -86,6 +109,7 @@ module Spanx
           Spanx::SetElement.new(slice[0].to_i, slice[1].to_i)
         end.sort
       end
+
     end
   end
 end

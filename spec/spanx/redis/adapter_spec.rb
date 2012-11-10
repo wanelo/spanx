@@ -4,13 +4,13 @@ require 'timecop'
 
 describe Spanx::Redis::Adapter do
 
-  before do
-    Spanx.stub(:redis).and_return(Redis.new)
-  end
+  before { Spanx.stub(:redis).and_return(redis_client) }
+  let(:redis_client) { Redis.new }
 
   let(:resolution) { 10 }
   let(:history) { 60 }
-  let(:adapter) { Spanx::Redis::Adapter.new(collector: {resolution: resolution, history: history}) }
+  let(:config) { { collector: {resolution: resolution, history: history} } }
+  let(:adapter) { Spanx::Redis::Adapter.new(config) }
   let(:redis) { Spanx.redis }
 
   describe '#increment_ip' do
@@ -99,6 +99,36 @@ describe Spanx::Redis::Adapter do
     it "removes redis keys for blocked ips" do
       redis.keys("i:1.2.3.4").should_not be_empty
       redis.keys("i:5.6.7.8").should be_empty
+    end
+  end
+
+  describe "#disable" do
+    before do
+      adapter.should be_enabled
+      adapter.should_not be_disabled
+      adapter.disable
+    end
+
+    it "disables the adapter" do
+      adapter.should be_disabled
+      adapter.should_not be_enabled
+    end
+
+    it "persists across different Adapter instances" do
+      Spanx::Redis::Adapter.new(config).should be_disabled
+    end
+  end
+
+  describe "#enable" do
+    before do
+      adapter.disable
+      adapter.should_not be_enabled
+      adapter.enable
+    end
+
+    it "enables the adapter" do
+      adapter.should be_enabled
+      adapter.should_not be_disabled
     end
   end
 end
