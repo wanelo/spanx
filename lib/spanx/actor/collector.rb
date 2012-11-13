@@ -7,12 +7,11 @@ module Spanx
     class Collector
       include Spanx::Helper::Timing
 
-      attr_accessor :queue, :config, :adapter, :semaphore, :cache
+      attr_accessor :queue, :config, :semaphore, :cache
 
       def initialize(config, queue)
         @queue = queue
         @config = config
-        @adapter = Spanx::Redis::Adapter.new(config)
         @semaphore = Mutex.new
         @cache = Hash.new(0)
       end

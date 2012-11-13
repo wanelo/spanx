@@ -17,6 +17,9 @@ describe Spanx::Config do
         Pause.config.redis_host.should == "127.0.0.5"
         Pause.config.redis_port.should == 6300
         Pause.config.redis_db.should == 13
+
+        Pause.config.resolution.should == 300
+        Pause.config.history.should == 21600
       end
 
       it "configures period checks on IPChecker" do

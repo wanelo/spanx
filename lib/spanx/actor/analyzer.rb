@@ -39,25 +39,26 @@ module Spanx
       def analyze_all_ips
         return unless adapter.enabled?
 
-        blocked_ips.clear
         @previously_blocked_ips = IPChecker.blocked_identifiers
 
         ips = IPChecker.tracked_identifiers
 
         Logger.logging "analyzed #{ips.size} IPs" do
-          ips.each { |ip| analyze_ip(ip) }
+          ips.each do |ip|
+            blocked_ip = analyze_ip(ip)
+            blocked_ips << blocked_ip if blocked_ip
+          end
         end
 
+        Logger.log "blocking [#{blocked_ips.size}] ips" unless blocked_ips.empty?
         call_notifiers(blocked_ips)
-        blocked_ips
+        blocked_ips.clear
       end
 
       # Analyze individual IP for all defined periods.  As soon as one
       # rule is triggered, exit the method
       def analyze_ip(ip)
-        IPChecker.new(ip).ok? do |period_check, sum|
-          @blocked_ips << ::Spanx::BlockedIp.new(ip, period_check, sum, Time.now.to_i)
-        end
+        IPChecker.new(ip).analyze
       end
 
       private
@@ -78,7 +79,7 @@ module Spanx
 
       def call_notifiers(blocked_ips)
         unless notifiers.empty?
-          blocked_ips.reject { |b| @previously_blocked_ips.include?(b.ip) }.each do |blocked_ip|
+          blocked_ips.reject { |b| @previously_blocked_ips.include?(b.identifier) }.each do |blocked_ip|
             self.notifiers.each do |notifier|
               begin
                 notifier.publish(blocked_ip)

@@ -19,7 +19,11 @@ describe Spanx::Actor::Writer do
     end
 
     context "when adapter is enabled" do
-      let(:adapter) { mock(blocked_ips: ["1.2.3.4", "127.0.0.1"], enabled?: true)}
+      before do
+        IPChecker.stub(:blocked_identifiers).and_return(["1.2.3.4", "127.0.0.1"])
+      end
+
+      let(:adapter) { mock(enabled?: true)}
 
       it "properly writes IP block file" do
         writer.write
@@ -29,7 +33,7 @@ describe Spanx::Actor::Writer do
     end
 
     context "when adapter is disabled" do
-      let(:adapter) { mock(blocked_ips: ["1.2.3.4", "127.0.0.1"], enabled?: false)}
+      let(:adapter) { mock(enabled?: false)}
 
       it "writes an empty IP block file" do
         writer.write

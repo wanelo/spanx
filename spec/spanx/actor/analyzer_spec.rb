@@ -42,8 +42,8 @@ describe Spanx::Actor::Analyzer do
     let(:now) { period_marker(10, Time.now.to_i) + 1 }
 
     context "IP blocking rules are not matched" do
-      it "returns true" do
-        analyzer.analyze_ip(ip1).should be_true
+      it "returns nil" do
+        analyzer.analyze_ip(ip1).should be_nil
       end
     end
 
@@ -55,18 +55,9 @@ describe Spanx::Actor::Analyzer do
         IPChecker.new(ip1).increment!(now - 15, 1)
       end
 
-      it "returns false" do
-        analyzer.analyze_ip(ip1).should be_false
+      it "returns a Pause::BlockedAction" do
+        analyzer.analyze_ip(ip1).should be_a(Pause::BlockedAction)
       end
-
-      describe "blocked_ips" do
-        it "adds blocked IPs into an array" do
-          analyzer.analyze_ip(ip1)
-          analyzer.blocked_ips.should_not be_empty
-          analyzer.blocked_ips.first.should be_a(Spanx::BlockedIp)
-        end
-      end
-
     end
   end
 
@@ -85,18 +76,17 @@ describe Spanx::Actor::Analyzer do
       end
     end
 
-    context "danger IP is found" do
+    context "adapter is enabled" do
       let(:period_check) { double(period_seconds: 1, max_allowed: 1, block_ttl: nil) }
-      let(:blocked_ip) { Spanx::BlockedIp.new(ip2, period_check, 200, 1234566) }
+      let(:blocked_ip) { Pause::BlockedAction.new(mock(identifier:ip2), period_check, 200, 1234566) }
 
       before do
         IPChecker.should_receive(:tracked_identifiers).and_return([ip1, ip2])
-        analyzer.should_receive(:analyze_ip).with(ip1).and_return(nil)
-        analyzer.should_receive(:analyze_ip).with(ip2).and_return(blocked_ip)
+        analyzer.should_receive(:analyze_ip).with(ip1)
+        analyzer.should_receive(:analyze_ip).with(ip2)
       end
 
-      it "blocks the IP" do
-        adapter.should_receive(:block_ips).with([blocked_ip]).any_number_of_times
+      it "analyzes each IP found" do
         analyzer.analyze_all_ips
       end
     end
@@ -120,7 +110,7 @@ describe Spanx::Actor::Analyzer do
     end
 
     it "should publish to notifiers on blocking IP" do
-      fake_notifier.should_receive(:publish).with(an_instance_of(Spanx::BlockedIp))
+      fake_notifier.should_receive(:publish).with(an_instance_of(Pause::BlockedAction))
       IPChecker.new(ip1).increment!(Time.now.to_i - 5, 50000)
       analyzer.analyze_all_ips
     end

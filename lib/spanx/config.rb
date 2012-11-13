@@ -17,6 +17,9 @@ module Spanx
         pause.redis_host = self[:redis][:host]
         pause.redis_port = self[:redis][:port]
         pause.redis_db   = self[:redis][:database]
+
+        pause.resolution = self[:collector][:resolution]
+        pause.history    = self[:collector][:history]
       end
 
       self

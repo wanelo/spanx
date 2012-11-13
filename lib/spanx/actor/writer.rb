@@ -27,7 +27,7 @@ module Spanx
 
       def write
         if adapter.enabled?
-          ips = adapter.blocked_ips
+          ips = IPChecker.blocked_identifiers
         else
           Logger.log "writing empty block file due to disabled state"
           ips = []
