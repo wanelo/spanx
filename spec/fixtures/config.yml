@@ -1,7 +1,7 @@
 ---
 :redis:
-  :host: "127.0.0.1"
-  :port: 6380
-  :database: 1
+  :host: "127.0.0.5"
+  :port: 6300
+  :database: 13
 :symbol_key: "symbol value"
 string_key: "string value"

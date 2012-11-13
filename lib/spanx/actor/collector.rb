@@ -1,3 +1,4 @@
+require 'pause'
 require 'spanx/logger'
 require 'spanx/helper/timing'
 
@@ -39,7 +40,7 @@ module Spanx
             semaphore.synchronize {
               Logger.logging "flushing cache with [#{cache.keys.size}] keys" do
                 cache.each_pair do |key, count|
-                  adapter.increment_ip key[0], key[1], count
+                  IPChecker.new(key[0]).increment!(key[1], count)
                 end
                 reset_cache
               end

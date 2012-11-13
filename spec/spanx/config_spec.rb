@@ -2,19 +2,33 @@ require 'spec_helper'
 
 describe Spanx::Config do
   describe '#new' do
-    it "loads the correct config file" do
-      config = Spanx::Config.new("spec/fixtures/config.yml")
-      config[:redis][:host].should eql("127.0.0.1")
-      config[:redis][:port].should == 6380
-      config[:redis][:database].should == 1
-    end
+    context "with correct valid file" do
+      before do
+        @config = Spanx::Config.new("spec/fixtures/config.yml")
+      end
 
-    it "permits hash access via strings or symbols" do
-      config = Spanx::Config.new("spec/fixtures/config.yml")
-      config[:string_key] = "string value"
-      config["string_key"] = "string value"
-      config[:symbol_key] = "symbol value"
-      config["symbol_key"] = "symbol value"
+      it "loads the correct config file" do
+        @config[:redis][:host].should == "127.0.0.5"
+        @config[:redis][:port].should == 6300
+        @config[:redis][:database].should == 13
+      end
+
+      it "configures Pause redis" do
+        Pause.config.redis_host.should == "127.0.0.5"
+        Pause.config.redis_port.should == 6300
+        Pause.config.redis_db.should == 13
+      end
+
+      it "configures period checks on IPChecker" do
+
+      end
+
+      it "permits hash access via strings or symbols" do
+        @config[:string_key] = "string value"
+        @config["string_key"] = "string value"
+        @config[:symbol_key] = "symbol value"
+        @config["symbol_key"] = "symbol value"
+      end
     end
 
     context "config file does not exist" do

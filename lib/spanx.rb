@@ -1,9 +1,13 @@
 require 'redis'
+require 'pause'
 require 'spanx/version'
 require 'spanx/helper'
 require 'spanx/logger'
 require 'spanx/config'
 require 'spanx/usage'
+
+require 'spanx/ip_checker'
+
 require 'spanx/cli'
 require 'spanx/notifier/base'
 require 'spanx/notifier/campfire'
@@ -27,18 +31,6 @@ module Spanx
   end
 
   class BlockedIp < Struct.new(:ip, :period, :count, :time_blocked)
-  end
-
-  class PeriodCheck < Struct.new(:period_seconds, :max_allowed, :block_ttl)
-    def <=>(other)
-      self.period_seconds <=> other.period_seconds
-    end
-
-    def self.from_config(config)
-      @periods ||= config[:analyzer][:period_checks].map do |check|
-        self.new(check[:period_seconds], check[:max_allowed], check[:block_ttl])
-      end.sort
-    end
   end
 
   class << self

@@ -10,15 +10,17 @@ module Spanx
     class Analyzer
       include Spanx::Helper::Timing
 
-      attr_accessor :config, :adapter, :periods, :notifiers
+      attr_accessor :config, :adapter, :notifiers, :blocked_ips
 
       def initialize config
         @config = config
         @adapter = Spanx::Redis::Adapter.new(config)
-        @periods = Spanx::PeriodCheck.from_config(config)
         @audit_file = config[:audit_file]
         @notifiers = []
         initialize_notifiers(config) if config[:analyzer][:blocked_ip_notifiers]
+
+        @blocked_ips = []
+        @previously_blocked_ips = []
       end
 
       def run
@@ -37,40 +39,25 @@ module Spanx
       def analyze_all_ips
         return unless adapter.enabled?
 
-        blocked_ip_structs = []
-        ips = adapter.ips
+        blocked_ips.clear
+        @previously_blocked_ips = IPChecker.blocked_identifiers
+
+        ips = IPChecker.tracked_identifiers
 
         Logger.logging "analyzed #{ips.size} IPs" do
-          ips.each do |ip|
-            ip_block = analyze_ip(ip)
-            blocked_ip_structs << ip_block if ip_block
-          end
+          ips.each { |ip| analyze_ip(ip) }
         end
 
-        unless blocked_ip_structs.empty?
-          call_notifiers(blocked_ip_structs)
-          adapter.block_ips(blocked_ip_structs)
-        end
-        blocked_ip_structs
+        call_notifiers(blocked_ips)
+        blocked_ips
       end
 
       # Analyze individual IP for all defined periods.  As soon as one
       # rule is triggered, exit the method
       def analyze_ip(ip)
-        timestamp = period_marker(config[:collector][:resolution], Time.now.to_i)
-        set = adapter.ip_history(ip)
-        periods.each do |period|
-          start_time = timestamp - period.period_seconds
-          set.reverse.inject(0) do |sum, element|
-            break if element.ts < start_time
-            sum += element.count
-            if sum >= period.max_allowed
-              return Spanx::BlockedIp.new(ip, period, sum, Time.now.to_i)
-            end
-            sum
-          end
+        IPChecker.new(ip).ok? do |period_check, sum|
+          @blocked_ips << ::Spanx::BlockedIp.new(ip, period_check, sum, Time.now.to_i)
         end
-        nil
       end
 
       private
@@ -89,10 +76,9 @@ module Spanx
         end
       end
 
-      def call_notifiers(blocked_ip_structs)
+      def call_notifiers(blocked_ips)
         unless notifiers.empty?
-          currently_blocked_ips = adapter.blocked_ips
-          blocked_ip_structs.reject { |b| currently_blocked_ips.include?(b.ip) }.each do |blocked_ip|
+          blocked_ips.reject { |b| @previously_blocked_ips.include?(b.ip) }.each do |blocked_ip|
             self.notifiers.each do |notifier|
               begin
                 notifier.publish(blocked_ip)

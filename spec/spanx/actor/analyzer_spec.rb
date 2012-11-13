@@ -1,25 +1,24 @@
 require 'spec_helper'
 require 'timecop'
+require 'pause'
 
 describe Spanx::Actor::Analyzer do
   include Spanx::Helper::Timing
 
-
   before do
-    Spanx.stub(:redis).and_return(Redis.new)
+    Pause.stub(:config).and_return(mock(resolution: 10, history: 100))
+    Pause::Redis::Adapter.any_instance.stub(:redis).and_return(Redis.new)
+
+    pause_analyzer = Pause::Analyzer.new
+    Pause.stub(:analyzer).and_return(pause_analyzer)
   end
 
   let(:analyzer) { Spanx::Actor::Analyzer.new(config) }
+  let(:notifiers) { [] }
   let(:config) {
     {
-        analyzer: {period_checks: periods, block_timeout: 50, blocked_ip_notifiers: [ "Spanx::Notifier::Campfire" ]},
+        analyzer: {period_checks: periods, block_timeout: 50, blocked_ip_notifiers: notifiers},
         collector: {resolution: 10, history: 100},
-        campfire: {
-            enabled: true,
-            room_id: 1111,
-            token: 'aaffdfsdfadfasdfasdfasdf',
-            account: "test"
-        }
     }
   }
   let(:periods) {
@@ -28,109 +27,52 @@ describe Spanx::Actor::Analyzer do
         {period_seconds: 30, max_allowed: 3, block_ttl: 20}
     ]
   }
-  let (:period_structs) do
-    [
-        Spanx::PeriodCheck.new(10, 2, 20),
-        Spanx::PeriodCheck.new(30, 3, 20)
-    ]
-  end
 
-  let(:adapter) { analyzer.adapter }
+  before do
+    IPChecker.checks = periods.map do |period|
+      Pause::PeriodCheck.new(period[:period_seconds], period[:max_allowed], period[:block_ttl])
+    end
+  end
 
   let(:ip1) { "127.0.0.1" }
   let(:ip2) { "192.168.0.1" }
-
-  context "#periods" do
-    it "should properly assign periods" do
-      analyzer.periods.should_not be_empty
-      analyzer.periods.size.should eql(2)
-      Spanx::PeriodCheck.from_config(config).should eql(period_structs)
-    end
-  end
 
   describe "#analyze_ip" do
 
     let(:now) { period_marker(10, Time.now.to_i) + 1 }
 
-    context "IP count matches first period in list" do
-      it "returns a blocked IP" do
-        adapter.increment_ip(ip1, now - 5, 2)
-        adapter.increment_ip(ip1, now - 15, 1)
-
-        adapter.ip_history(ip1).should_not be_empty
-        adapter.ip_history(ip1).size.should eql(2)
-
-        blocked_ip = analyzer.analyze_ip(ip1)
-        blocked_ip.should_not be_nil
-        blocked_ip.ip.should eql(ip1)
-        blocked_ip.period.should eql(period_structs[0])
+    context "IP blocking rules are not matched" do
+      it "returns true" do
+        analyzer.analyze_ip(ip1).should be_true
       end
     end
 
-    context "IP count matches later period" do
-      it "returns a blocked IP" do
-        adapter.increment_ip(ip1, now - 5, 1)
-        adapter.increment_ip(ip1, now - 15, 2)
-
-        adapter.ip_history(ip1).should_not be_empty
-        adapter.ip_history(ip1).size.should eql(2)
-
-        blocked_ip = analyzer.analyze_ip(ip1)
-        blocked_ip.should_not be_nil
-        blocked_ip.ip.should eql(ip1)
-        blocked_ip.period.should eql(period_structs[1])
-      end
-    end
-
-    context "IP count is just under threshold" do
-      it "does not returns a blocked IP" do
-        adapter.increment_ip(ip1, now - 5, 1)
-        adapter.increment_ip(ip1, now - 15, 1)
-        adapter.increment_ip(ip1, now - 35, 1)
-
-        adapter.ip_history(ip1).should_not be_empty
-        adapter.ip_history(ip1).size.should eql(3)
-
-        analyzer.analyze_ip(ip1).should be_nil
-      end
-    end
-
-    context "no period can be matched" do
-      it "return nil" do
-        analyzer.adapter.increment_ip(ip1, Time.now.to_i)
-        analyzer.analyze_ip(ip1).should be_nil
-      end
-    end
-
-    context "notifier" do
+    context "IP blocking rules are matched" do
       before do
-        Spanx::Notifier::Campfire.any_instance.stub(:enabled).and_return(true)
+        analyzer.blocked_ips.should be_empty
+
+        IPChecker.new(ip1).increment!(now - 5, 2)
+        IPChecker.new(ip1).increment!(now - 15, 1)
       end
 
-      it "is invoked when IP is blocked" do
-        analyzer.notifiers.size.should eql(1)
-
-        campfire = analyzer.notifiers.first
-        campfire.should_receive(:publish)
-
-        adapter.increment_ip(ip1, now - 5, 2)
-        adapter.increment_ip(ip1, now - 15, 1)
-
-        adapter.ip_history(ip1).should_not be_empty
-        adapter.ip_history(ip1).size.should eql(2)
-
-        blocked_ips = analyzer.analyze_all_ips
-        blocked_ips.should_not be_empty
-        bip = blocked_ips.first
-        bip.ip.should eql(ip1)
-        bip.period.should eql(period_structs[0])
-        message = campfire.send(:generate_block_ip_message, bip)
-        message.include?(ip1).should be_true
+      it "returns false" do
+        analyzer.analyze_ip(ip1).should be_false
       end
+
+      describe "blocked_ips" do
+        it "adds blocked IPs into an array" do
+          analyzer.analyze_ip(ip1)
+          analyzer.blocked_ips.should_not be_empty
+          analyzer.blocked_ips.first.should be_a(Spanx::BlockedIp)
+        end
+      end
+
     end
   end
 
   describe "#analyze_all_ips" do
+    let(:adapter) { analyzer.adapter }
+
     context "adapter is disabled" do
       before do
         adapter.stub(:ips).and_return([ip1, ip2])
@@ -148,7 +90,7 @@ describe Spanx::Actor::Analyzer do
       let(:blocked_ip) { Spanx::BlockedIp.new(ip2, period_check, 200, 1234566) }
 
       before do
-        adapter.should_receive(:ips).and_return([ip1, ip2])
+        IPChecker.should_receive(:tracked_identifiers).and_return([ip1, ip2])
         analyzer.should_receive(:analyze_ip).with(ip1).and_return(nil)
         analyzer.should_receive(:analyze_ip).with(ip2).and_return(blocked_ip)
       end
@@ -159,4 +101,29 @@ describe Spanx::Actor::Analyzer do
       end
     end
   end
+
+  context "notifiers" do
+    let(:notifiers) { ["FakeNotifier"] }
+    let(:fake_notifier) { mock() }
+    let(:blocked_ip) { mock() }
+
+    class FakeNotifier
+    end
+
+    before do
+      FakeNotifier.should_receive(:new).with(config).and_return(fake_notifier)
+    end
+
+    it "should initialize notifier based on config" do
+      analyzer.notifiers.size.should == 1
+      analyzer.notifiers.first.should == fake_notifier
+    end
+
+    it "should publish to notifiers on blocking IP" do
+      fake_notifier.should_receive(:publish).with(an_instance_of(Spanx::BlockedIp))
+      IPChecker.new(ip1).increment!(Time.now.to_i - 5, 50000)
+      analyzer.analyze_all_ips
+    end
+  end
+
 end

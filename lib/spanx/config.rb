@@ -1,4 +1,5 @@
 require 'yaml'
+require 'pause'
 require 'spanx/helper/exit'
 
 module Spanx
@@ -11,6 +12,13 @@ module Spanx
       super
       @filename = filename
       load_file
+
+      Pause.configure do |pause|
+        pause.redis_host = self[:redis][:host]
+        pause.redis_port = self[:redis][:port]
+        pause.redis_db   = self[:redis][:database]
+      end
+
       self
     end
 
