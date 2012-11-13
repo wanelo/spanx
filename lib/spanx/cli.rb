@@ -42,3 +42,6 @@ end
 
 require 'spanx/cli/watch'
 require 'spanx/cli/analyze'
+require 'spanx/cli/disable'
+require 'spanx/cli/enable'
+require 'spanx/cli/flush'
