@@ -5,8 +5,9 @@ Spanx
 
 Spank down IP spam: IP-based rate limiting for web applications behind HTTP server such as nginx or Apache.
 
-Spanx is a simple Redis-based web request rate limiter, which integrates into any web application simply by monitoring
-one or more HTTP server access log file(s) in real time (think Apache/nginx access.log).
+Spanx integrates into any web application simply by monitoring one or more HTTP server access log file(s)
+in real time (think Apache/nginx access.log). Spanx is built on top of the gem Pause, which is a simple Redis-based rate
+limiter.
 
 Basic flow is as follows:
 
