@@ -17,7 +17,7 @@ module Spanx
 
         @thread = Thread.new do
           Thread.current[:name] = "email notifier"
-          Logger.log "sending notification email for #{blocked_ip.ip}"
+          Logger.log "sending notification email for #{blocked_ip.identifier}"
 
           mail = Mail.new
           mail.to = config[:to]
@@ -36,7 +36,7 @@ module Spanx
       private
 
       def subject(blocked_ip)
-        "#{config[:subject] || "IP Blocked:"} #{blocked_ip.ip}"
+        "#{config[:subject] || "IP Blocked:"} #{blocked_ip.identifier}"
       end
 
       def configure_email_gateway

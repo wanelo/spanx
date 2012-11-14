@@ -10,11 +10,10 @@ module Spanx
     class Analyzer
       include Spanx::Helper::Timing
 
-      attr_accessor :config, :adapter, :notifiers, :blocked_ips
+      attr_accessor :config, :notifiers, :blocked_ips
 
       def initialize config
         @config = config
-        @adapter = Spanx::Redis::Adapter.new(config)
         @audit_file = config[:audit_file]
         @notifiers = []
         initialize_notifiers(config) if config[:analyzer][:blocked_ip_notifiers]
@@ -37,7 +36,7 @@ module Spanx
       # Look through every IP on the stack. IPs that fulfill a PeriodCheck
       # are pushed onto a redis block list.
       def analyze_all_ips
-        return unless adapter.enabled?
+        return unless Spanx::IPChecker.enabled?
 
         @previously_blocked_ips = Spanx::IPChecker.blocked_identifiers
 

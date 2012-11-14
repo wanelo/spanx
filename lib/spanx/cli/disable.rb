@@ -31,6 +31,6 @@ class Spanx::CLI::Disable < Spanx::CLI
 
   def run(argv = ARGV)
     generate_config(argv)
-    Spanx::Redis::Adapter.new(config).disable
+    Spanx::IPChecker.disable
   end
 end

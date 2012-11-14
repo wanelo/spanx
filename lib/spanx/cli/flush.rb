@@ -31,6 +31,6 @@ class Spanx::CLI::Flush < Spanx::CLI
 
   def run(argv = ARGV)
     generate_config(argv)
-    Spanx::Redis::Adapter.new(config).unblock_all
+    Spanx::IPChecker.unblock_all
   end
 end

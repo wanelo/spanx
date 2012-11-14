@@ -5,7 +5,7 @@ module Spanx
       # Takes an instance of the Spanx::BlockedIp struct.
       # Overwrite this a subclass to define real behavior
       def publish(blocked_ip)
-        raise 'Abstrace Method Not Implemented'
+        raise 'Abstract Method Not Implemented'
       end
 
       protected

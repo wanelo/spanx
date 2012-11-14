@@ -18,27 +18,11 @@ require 'spanx/actor/log_reader'
 require 'spanx/actor/collector'
 require 'spanx/actor/analyzer'
 require 'spanx/actor/writer'
-require 'spanx/redis/adapter'
 require 'spanx/whitelist'
 
 require 'spanx/runner'
 
 module Spanx
-  class SetElement < Struct.new(:ts, :count)
-    def <=>(other)
-      self.ts <=> other.ts
-    end
-  end
-
-  class BlockedIp < Struct.new(:ip, :period, :count, :time_blocked)
-  end
-
-  class << self
-    def redis(config = nil)
-      @redis ||= ::Redis.new(host: config[:host], port: config[:port], db: config[:db])
-    end
-
-  end
 end
 
 class String

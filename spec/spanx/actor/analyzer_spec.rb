@@ -6,9 +6,8 @@ describe Spanx::Actor::Analyzer do
   include Spanx::Helper::Timing
 
   before do
-    Pause.stub(:config).and_return(mock(resolution: 10, history: 100))
-    Pause::Redis::Adapter.any_instance.stub(:redis).and_return(Redis.new)
-
+    pause_config = mock(resolution: 10, history: 100, redis_host: "1.2.3.4", redis_port: 1, redis_db: 1)
+    Pause.stub(:config).and_return(pause_config)
     pause_analyzer = Pause::Analyzer.new
     Pause.stub(:analyzer).and_return(pause_analyzer)
   end
@@ -49,8 +48,6 @@ describe Spanx::Actor::Analyzer do
 
     context "IP blocking rules are matched" do
       before do
-        analyzer.blocked_ips.should be_empty
-
         Spanx::IPChecker.new(ip1).increment!(now - 5, 2)
         Spanx::IPChecker.new(ip1).increment!(now - 15, 1)
       end
@@ -62,12 +59,10 @@ describe Spanx::Actor::Analyzer do
   end
 
   describe "#analyze_all_ips" do
-    let(:adapter) { analyzer.adapter }
-
-    context "adapter is disabled" do
+    context "checker is disabled" do
       before do
-        adapter.stub(:ips).and_return([ip1, ip2])
-        adapter.stub(:enabled?).and_return(false)
+        Spanx::IPChecker.stub(:blocked_identifiers).and_return([ip1, ip2])
+        Spanx::IPChecker.stub(:enabled?).and_return(false)
         analyzer.should_not_receive(:analyze_ip)
       end
 

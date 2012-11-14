@@ -31,6 +31,6 @@ class Spanx::CLI::Enable < Spanx::CLI
 
   def run(argv = ARGV)
     generate_config(argv)
-    Spanx::Redis::Adapter.new(config).enable
+    Spanx::IPChecker.enable
   end
 end

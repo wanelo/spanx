@@ -12,18 +12,20 @@ describe Spanx::Actor::Writer do
     let(:config) { {
       block_file: "/tmp/block_file.#{$$}",
     }}
-    let(:writer) { Spanx::Actor::Writer.new(config, adapter)}
+    let(:writer) { Spanx::Actor::Writer.new(config)}
 
     after do
       ::FileUtils.rm(config[:block_file])
     end
 
+    before do
+      Spanx::IPChecker.stub(:blocked_identifiers).and_return(["1.2.3.4", "127.0.0.1"])
+    end
+
     context "when adapter is enabled" do
       before do
-        Spanx::IPChecker.stub(:blocked_identifiers).and_return(["1.2.3.4", "127.0.0.1"])
+        Spanx::IPChecker.stub(:enabled?).and_return(true)
       end
-
-      let(:adapter) { mock(enabled?: true)}
 
       it "properly writes IP block file" do
         writer.write
@@ -33,7 +35,9 @@ describe Spanx::Actor::Writer do
     end
 
     context "when adapter is disabled" do
-      let(:adapter) { mock(enabled?: false)}
+      before do
+        Spanx::IPChecker.stub(:enabled?).and_return(false)
+      end
 
       it "writes an empty IP block file" do
         writer.write
@@ -45,11 +49,10 @@ describe Spanx::Actor::Writer do
 
   describe "#run_command" do
     let(:tempfile) { Tempfile.new("output")}
-    let(:adapter) { mock() }
     let(:config) { {
       run_command: "echo 'OK' >> #{tempfile.path}"
     }}
-    let(:writer) { Spanx::Actor::Writer.new(config, adapter)}
+    let(:writer) { Spanx::Actor::Writer.new(config)}
     it "properly runs command" do
       writer.run_command
       contents = File.read(tempfile.path)

@@ -6,11 +6,10 @@ module Spanx
     class Writer
       include Spanx::Helper::Exit
 
-      attr_accessor :config, :adapter
+      attr_accessor :config
 
-      def initialize config, adapter = nil
+      def initialize config
         @config = config
-        @adapter = adapter || Spanx::Redis::Adapter.new(config)
         @block_file = config[:block_file]
         @run_command = config[:run_command]
       end
@@ -26,7 +25,7 @@ module Spanx
       end
 
       def write
-        if adapter.enabled?
+        if Spanx::IPChecker.enabled?
           ips = Spanx::IPChecker.blocked_identifiers
         else
           Logger.log "writing empty block file due to disabled state"
