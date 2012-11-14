@@ -1,7 +1,7 @@
 module Spanx
   module Notifier
     class AuditLog < Base
-      attr_accessor :audi_file
+      attr_accessor :audit_file
 
       def initialize(config)
         @audit_file = config[:audit_file]
@@ -10,7 +10,7 @@ module Spanx
 
       def publish(b)
         File.open(@audit_file, "a") do |file|
-          file.puts "#{Time.now} -- #{sprintf("%-16s", b.ip)} period=#{b.period.period_seconds}s max=#{b.period.max_allowed} count=#{b.count} ttl=#{b.period.block_ttl}s"
+          file.puts "#{Time.now} -- #{sprintf("%-16s", b.identifier)} period=#{b.period_check.period_seconds}s max=#{b.period_check.max_allowed} count=#{b.sum} ttl=#{b.period_check.block_ttl}s"
         end
       end
     end
