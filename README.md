@@ -1,4 +1,7 @@
-# Spanx
+Spanx
+=====
+
+[![Build status](https://secure.travis-ci.org/wanelo/spanx.png)](http://travis-ci.org/wanelo/spanx)
 
 Spank down IP spam: IP-based rate limiting for web applications behind HTTP server such as nginx or Apache.
 
