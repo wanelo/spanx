@@ -19,7 +19,7 @@ describe Spanx::Actor::Writer do
     end
 
     before do
-      Spanx::IPChecker.stub(:blocked_identifiers).and_return(["1.2.3.4", "127.0.0.1"])
+      Spanx::IPChecker.stub(:rate_limited_identifiers).and_return(["1.2.3.4", "127.0.0.1"])
     end
 
     context "when adapter is enabled" do

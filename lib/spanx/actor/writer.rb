@@ -26,7 +26,7 @@ module Spanx
 
       def write
         if Spanx::IPChecker.enabled?
-          ips = Spanx::IPChecker.blocked_identifiers
+          ips = Spanx::IPChecker.rate_limited_identifiers
         else
           Logger.log "writing empty block file due to disabled state"
           ips = []

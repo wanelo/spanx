@@ -36,24 +36,24 @@ describe Spanx::Actor::Analyzer do
   let(:ip1) { "127.0.0.1" }
   let(:ip2) { "192.168.0.1" }
 
-  describe "#analyze_ip" do
+  describe "#RateLimitedEvent" do
 
     let(:now) { period_marker(10, Time.now.to_i) + 1 }
 
     context "IP blocking rules are not matched" do
       it "returns nil" do
-        analyzer.analyze_ip(ip1).should be_nil
+        Spanx::IPChecker.new(ip1).analyze.should be_nil
       end
     end
 
     context "IP blocking rules are matched" do
       before do
-        Spanx::IPChecker.new(ip1).increment!(now - 5, 2)
-        Spanx::IPChecker.new(ip1).increment!(now - 15, 1)
+        Spanx::IPChecker.new(ip1).increment!(2, now - 5)
+        Spanx::IPChecker.new(ip1).increment!(1, now - 15)
       end
 
-      it "returns a Pause::BlockedAction" do
-        analyzer.analyze_ip(ip1).should be_a(Pause::BlockedAction)
+      it "returns a Pause::RateLimitedEvent" do
+        Spanx::IPChecker.new(ip1).analyze.should be_a(Pause::RateLimitedEvent)
       end
     end
   end
@@ -61,7 +61,7 @@ describe Spanx::Actor::Analyzer do
   describe "#analyze_all_ips" do
     context "checker is disabled" do
       before do
-        Spanx::IPChecker.stub(:blocked_identifiers).and_return([ip1, ip2])
+        Spanx::IPChecker.stub(:rate_limited_identifiers).and_return([ip1, ip2])
         Spanx::IPChecker.stub(:enabled?).and_return(false)
         analyzer.should_not_receive(:analyze_ip)
       end
@@ -73,12 +73,11 @@ describe Spanx::Actor::Analyzer do
 
     context "adapter is enabled" do
       let(:period_check) { double(period_seconds: 1, max_allowed: 1, block_ttl: nil) }
-      let(:blocked_ip) { Pause::BlockedAction.new(mock(identifier:ip2), period_check, 200, 1234566) }
 
       before do
         Spanx::IPChecker.should_receive(:tracked_identifiers).and_return([ip1, ip2])
-        analyzer.should_receive(:analyze_ip).with(ip1)
-        analyzer.should_receive(:analyze_ip).with(ip2)
+        Spanx::IPChecker.should_receive(:new).with(ip1).and_return(mock(analyze: nil))
+        Spanx::IPChecker.should_receive(:new).with(ip2).and_return(mock(analyze: nil))
       end
 
       it "analyzes each IP found" do
@@ -105,8 +104,8 @@ describe Spanx::Actor::Analyzer do
     end
 
     it "should publish to notifiers on blocking IP" do
-      fake_notifier.should_receive(:publish).with(an_instance_of(Pause::BlockedAction))
-      Spanx::IPChecker.new(ip1).increment!(Time.now.to_i - 5, 50000)
+      fake_notifier.should_receive(:publish).with(an_instance_of(Pause::RateLimitedEvent))
+      Spanx::IPChecker.new(ip1).increment!(50000, Time.now.to_i - 5)
       analyzer.analyze_all_ips
     end
   end

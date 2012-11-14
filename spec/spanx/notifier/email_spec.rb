@@ -47,7 +47,7 @@ describe Spanx::Notifier::Email, "#publish" do
   let(:time_blocked) { Time.now }
   let(:period) { mock() }
   let(:action) { Spanx::IPChecker.new("1.2.3.4") }
-  let(:blocked_ip) { Pause::BlockedAction.new(action, period, 50, time_blocked) }
+  let(:blocked_ip) { Pause::RateLimitedEvent.new(action, period, 50, time_blocked) }
 
   before { Spanx::Notifier::Email.any_instance.stub(:configure_email_gateway) }
 

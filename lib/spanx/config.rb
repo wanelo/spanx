@@ -25,7 +25,7 @@ module Spanx
 
       if self.has_key?(:analyzer) && self[:analyzer].has_key?(:period_checks)
         self[:analyzer][:period_checks].each do |check|
-          Spanx::IPChecker.check check[:period_seconds].to_i, check[:max_allowed].to_i, check[:block_ttl].to_i
+          Spanx::IPChecker.check(check)
         end
       end
 
