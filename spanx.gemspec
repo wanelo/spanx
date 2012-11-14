@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = %w(lib)
   gem.version       = Spanx::VERSION
 
-  gem.add_dependency 'pause'
+  gem.add_dependency 'pause', '~> 0.0.2'
   gem.add_dependency 'file-tail'
   gem.add_dependency 'mixlib-cli'
   gem.add_dependency 'daemons'

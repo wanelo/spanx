@@ -33,7 +33,7 @@ module Spanx
       end
 
       def unblock_all
-        IPChecker.unblock_all
+        Spanx::IPChecker.unblock_all
       end
 
       private

@@ -1,6 +1,7 @@
 require 'yaml'
 require 'pause'
 require 'spanx/helper/exit'
+require 'spanx/ip_checker'
 
 module Spanx
   class Config < Hash
@@ -16,10 +17,16 @@ module Spanx
       Pause.configure do |pause|
         pause.redis_host = self[:redis][:host]
         pause.redis_port = self[:redis][:port]
-        pause.redis_db   = self[:redis][:database]
+        pause.redis_db = self[:redis][:database]
 
         pause.resolution = self[:collector][:resolution]
-        pause.history    = self[:collector][:history]
+        pause.history = self[:collector][:history]
+      end
+
+      if self.has_key?(:analyzer) && self[:analyzer].has_key?(:period_checks)
+        self[:analyzer][:period_checks].each do |check|
+          Spanx::IPChecker.check check[:period_seconds].to_i, check[:max_allowed].to_i, check[:block_ttl].to_i
+        end
       end
 
       self

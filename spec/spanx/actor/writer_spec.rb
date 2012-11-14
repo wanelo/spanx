@@ -20,7 +20,7 @@ describe Spanx::Actor::Writer do
 
     context "when adapter is enabled" do
       before do
-        IPChecker.stub(:blocked_identifiers).and_return(["1.2.3.4", "127.0.0.1"])
+        Spanx::IPChecker.stub(:blocked_identifiers).and_return(["1.2.3.4", "127.0.0.1"])
       end
 
       let(:adapter) { mock(enabled?: true)}

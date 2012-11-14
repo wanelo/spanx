@@ -39,9 +39,9 @@ module Spanx
       def analyze_all_ips
         return unless adapter.enabled?
 
-        @previously_blocked_ips = IPChecker.blocked_identifiers
+        @previously_blocked_ips = Spanx::IPChecker.blocked_identifiers
 
-        ips = IPChecker.tracked_identifiers
+        ips = Spanx::IPChecker.tracked_identifiers
 
         Logger.logging "analyzed #{ips.size} IPs" do
           ips.each do |ip|
@@ -58,7 +58,7 @@ module Spanx
       # Analyze individual IP for all defined periods.  As soon as one
       # rule is triggered, exit the method
       def analyze_ip(ip)
-        IPChecker.new(ip).analyze
+        Spanx::IPChecker.new(ip).analyze
       end
 
       private

@@ -21,31 +21,31 @@ describe Spanx::Redis::Adapter do
       pause.history = history
     end
 
-    IPChecker.check 10, 10, 60
+    Spanx::IPChecker.check 10, 10, 60
   end
 
 
   describe "#unblock_all" do
     before do
-      IPChecker.new("1.2.3.4").increment!
-      IPChecker.new("5.6.7.8").increment!(Time.now.to_i, 1500)
+      Spanx::IPChecker.new("1.2.3.4").increment!
+      Spanx::IPChecker.new("5.6.7.8").increment!(Time.now.to_i, 1500)
 
-      IPChecker.tracked_identifiers.should include("1.2.3.4")
-      IPChecker.tracked_identifiers.should include("5.6.7.8")
+      Spanx::IPChecker.tracked_identifiers.should include("1.2.3.4")
+      Spanx::IPChecker.tracked_identifiers.should include("5.6.7.8")
 
-      IPChecker.new("5.6.7.8").ok?
-      IPChecker.blocked_identifiers.should include("5.6.7.8")
+      Spanx::IPChecker.new("5.6.7.8").ok?
+      Spanx::IPChecker.blocked_identifiers.should include("5.6.7.8")
 
       adapter.unblock_all
     end
 
     it "removes all blocked ips" do
-      IPChecker.blocked_identifiers.should be_empty
+      Spanx::IPChecker.blocked_identifiers.should be_empty
     end
 
     it "removes redis keys for blocked ips" do
-      IPChecker.tracked_identifiers.should include("1.2.3.4")
-      IPChecker.tracked_identifiers.should_not include("5.6.7.8")
+      Spanx::IPChecker.tracked_identifiers.should include("1.2.3.4")
+      Spanx::IPChecker.tracked_identifiers.should_not include("5.6.7.8")
     end
   end
 

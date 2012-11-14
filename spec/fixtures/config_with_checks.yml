@@ -1,0 +1,18 @@
+---
+:redis:
+  :host: "127.0.0.5"
+  :port: 6300
+  :database: 13
+:collector:
+  :resolution: 300       # seconds
+  :history: 21600        # seconds
+:analyzer:
+  :period_checks:
+    - :period_seconds: 10
+      :max_allowed: 5
+      :block_ttl: 60
+    - :period_seconds: 60
+      :max_allowed: 100
+      :block_ttl: 100
+:symbol_key: "symbol value"
+string_key: "string value"

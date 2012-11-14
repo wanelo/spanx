@@ -4,6 +4,7 @@ describe Spanx::Config do
   describe '#new' do
     context "with correct valid file" do
       before do
+        Spanx::IPChecker.checks = []
         @config = Spanx::Config.new("spec/fixtures/config.yml")
       end
 
@@ -23,7 +24,20 @@ describe Spanx::Config do
       end
 
       it "configures period checks on IPChecker" do
+        Spanx::IPChecker.checks.should be_empty
+        Spanx::Config.new("spec/fixtures/config_with_checks.yml")
+        Spanx::IPChecker.checks.should_not be_empty
 
+        check_1 = Spanx::IPChecker.checks.first
+        check_2 = Spanx::IPChecker.checks.last
+
+        check_1.period_seconds.should == 10
+        check_1.max_allowed.should == 5
+        check_1.block_ttl.should == 60
+
+        check_2.period_seconds.should == 60
+        check_2.max_allowed.should == 100
+        check_2.block_ttl.should == 100
       end
 
       it "permits hash access via strings or symbols" do

@@ -29,7 +29,7 @@ describe Spanx::Actor::Analyzer do
   }
 
   before do
-    IPChecker.checks = periods.map do |period|
+    Spanx::IPChecker.checks = periods.map do |period|
       Pause::PeriodCheck.new(period[:period_seconds], period[:max_allowed], period[:block_ttl])
     end
   end
@@ -51,8 +51,8 @@ describe Spanx::Actor::Analyzer do
       before do
         analyzer.blocked_ips.should be_empty
 
-        IPChecker.new(ip1).increment!(now - 5, 2)
-        IPChecker.new(ip1).increment!(now - 15, 1)
+        Spanx::IPChecker.new(ip1).increment!(now - 5, 2)
+        Spanx::IPChecker.new(ip1).increment!(now - 15, 1)
       end
 
       it "returns a Pause::BlockedAction" do
@@ -81,7 +81,7 @@ describe Spanx::Actor::Analyzer do
       let(:blocked_ip) { Pause::BlockedAction.new(mock(identifier:ip2), period_check, 200, 1234566) }
 
       before do
-        IPChecker.should_receive(:tracked_identifiers).and_return([ip1, ip2])
+        Spanx::IPChecker.should_receive(:tracked_identifiers).and_return([ip1, ip2])
         analyzer.should_receive(:analyze_ip).with(ip1)
         analyzer.should_receive(:analyze_ip).with(ip2)
       end
@@ -111,7 +111,7 @@ describe Spanx::Actor::Analyzer do
 
     it "should publish to notifiers on blocking IP" do
       fake_notifier.should_receive(:publish).with(an_instance_of(Pause::BlockedAction))
-      IPChecker.new(ip1).increment!(Time.now.to_i - 5, 50000)
+      Spanx::IPChecker.new(ip1).increment!(Time.now.to_i - 5, 50000)
       analyzer.analyze_all_ips
     end
   end
