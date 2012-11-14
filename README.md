@@ -21,7 +21,7 @@ from the consideration (for example, you Googlebot based on User-Agent).
 
 ### Design
 
-Spanx can be integrated as part of your application, or can run as a standalone ruby app.  Spanx requires ruby
+Spanx can be integrated into part of your application, or can run as a standalone ruby app.  Spanx requires ruby
 1.9.3, and it uses ruby threads to work on a few things in parallel.
 
 Spanx has two main components:
@@ -59,7 +59,7 @@ Or install it yourself as:
 
 ### Dependencies
 
-Spanx uses Redis to save state and do set logic on the information it finds.
+Spanx uses the Pause gem to persist state. This depends on Redis to save state and do set logic on the information it finds.
 
 ## Usage
 
