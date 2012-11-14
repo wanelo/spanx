@@ -3,8 +3,8 @@ rvm:
   - 1.9.3
 script: "bundle exec rspec"
 notifications:
-  email:
+  email: false
     recipients:
       - dev@wanelo.com
     on_success: never
-    on_failure: always
+    on_failure: change
