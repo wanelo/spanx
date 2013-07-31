@@ -6,7 +6,7 @@ describe Spanx::Actor::Analyzer do
   include Spanx::Helper::Timing
 
   before do
-    pause_config = mock(resolution: 10, history: 100, redis_host: "1.2.3.4", redis_port: 1, redis_db: 1)
+    pause_config = double(resolution: 10, history: 100, redis_host: "1.2.3.4", redis_port: 1, redis_db: 1)
     Pause.stub(:config).and_return(pause_config)
     pause_analyzer = Pause::Analyzer.new
     Pause.stub(:analyzer).and_return(pause_analyzer)
@@ -76,8 +76,8 @@ describe Spanx::Actor::Analyzer do
 
       before do
         Spanx::IPChecker.should_receive(:tracked_identifiers).and_return([ip1, ip2])
-        Spanx::IPChecker.should_receive(:new).with(ip1).and_return(mock(analyze: nil))
-        Spanx::IPChecker.should_receive(:new).with(ip2).and_return(mock(analyze: nil))
+        Spanx::IPChecker.should_receive(:new).with(ip1).and_return(double(analyze: nil))
+        Spanx::IPChecker.should_receive(:new).with(ip2).and_return(double(analyze: nil))
       end
 
       it "analyzes each IP found" do
@@ -88,8 +88,8 @@ describe Spanx::Actor::Analyzer do
 
   context "notifiers" do
     let(:notifiers) { ["FakeNotifier"] }
-    let(:fake_notifier) { mock() }
-    let(:blocked_ip) { mock() }
+    let(:fake_notifier) { double() }
+    let(:blocked_ip) { double() }
 
     class FakeNotifier
     end

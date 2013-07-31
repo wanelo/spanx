@@ -11,10 +11,10 @@ describe Spanx::Runner do
     end
 
     context "actor initialization" do
-      let(:collector) { mock("collector") }
-      let(:writer) { mock("writer") }
-      let(:log_reader) { mock("log_reader") }
-      let(:analyzer) { mock("analyzer") }
+      let(:collector) { double("collector") }
+      let(:writer) { double("writer") }
+      let(:log_reader) { double("log_reader") }
+      let(:analyzer) { double("analyzer") }
 
       before do
         Spanx::Runner.any_instance.stub(:collector).and_return(collector)
@@ -40,8 +40,8 @@ describe Spanx::Runner do
   end
 
   describe "#run" do
-    let(:actor1) { mock("actor") }
-    let(:actor2) { mock("actor") }
+    let(:actor1) { double("actor") }
+    let(:actor2) { double("actor") }
 
     before do
       actor1.should_receive(:run).and_return(actor1)
