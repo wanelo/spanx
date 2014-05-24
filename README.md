@@ -147,6 +147,41 @@ Usage: [bundle exec] spanx flush [options]
     -h, --help                       Show this message
 ```
 
+### api
+
+This starts an HTTP server with endpoints for managing blocked ips. Your
+application (or admin interface) can connect to this, for example.
+
+```bash
+Usage: [bundle exec] spanx api [options]
+    -c, --config CONFIG              Path to config file (YML) (required)
+    -g, --debug                      Log status to STDOUT
+    -h, --help                       Show this message
+    -h, --host                       Host for the HTTP server to listen on
+    -p, --port                       Port for the HTTP server to listen on
+```
+
+#### Endpoints:
+
+To retrieve a list of currently blocked ips:
+
+```
+GET /ips/blocked
+[
+  "127.0.0.1",
+  "11.100.193.12"
+]
+```
+
+To unblock a specific ip:
+
+This will remove the IP from redis and shortly afterwards it will be removed
+from the nginx block files.
+
+```
+DELETE /ips/blocked/11.100.193.12
+```
+
 ## Examples
 
 If you have only one load balancer, you may want to centralize all work into a single process, as such:
