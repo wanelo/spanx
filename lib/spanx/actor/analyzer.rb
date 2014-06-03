@@ -2,6 +2,7 @@ require 'spanx/logger'
 require 'spanx/helper/timing'
 require 'spanx/notifier/base'
 require 'spanx/notifier/campfire'
+require 'spanx/notifier/slack'
 require 'spanx/notifier/audit_log'
 require 'spanx/notifier/email'
 
