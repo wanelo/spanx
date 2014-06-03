@@ -18,6 +18,7 @@
     - "Spanx::Notifier::AuditLog"
     - "Spanx::Notifier::Campfire"
     - "Spanx::Notifier::Email"
+    - "Spanx::Notifier::Slack"
   :period_checks:
     - :period_seconds: 3600
       :max_allowed: 2000
