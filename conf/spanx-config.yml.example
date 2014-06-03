@@ -36,6 +36,10 @@
   :room_id: 1111
   :token: aaffdfsdfadfasdfasdfasdf
   :account: test
+:slack:
+  :enabled: true
+  :token: aaffdfsdfadfasdfasdfasdf
+  :base_url: 'https://wanelo.slack.com'
 :email:
   :enabled: true
   :to: "everyone@mycompany.com"
