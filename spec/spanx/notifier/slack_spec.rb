@@ -41,7 +41,7 @@ describe Spanx::Notifier::Slack do
         let(:blocked_ip_message) { 'shenanigans' }
         let!(:stubbed_request) {
             stub_request(:post, "https://wanelo.slack.com/services/hooks/incoming-webhook?token=shipoopi").
-                with(:body => {"payload"=>"{\"text\":\"#{blocked_ip_message}\"}"})
+                with(:body => "{\"text\":\"#{blocked_ip_message}\"}")
         }
 
         context 'when there is no configuration' do

@@ -1,3 +1,7 @@
+require 'net/http'
+require 'uri'
+require 'json'
+
 module Spanx
   module Notifier
     class Slack < Base
@@ -10,7 +14,17 @@ module Spanx
       def publish blocked_ip
         return nil unless enabled?
         message = generate_block_ip_message(blocked_ip)
-        Net::HTTP.post_form(endpoint, payload: JSON.dump({text: message}))
+
+        uri = endpoint
+
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+        request = Net::HTTP::Post.new(uri.request_uri, {'Content-Type' => 'text/json'})
+        request.body = { text: message }.to_json
+
+        http.request(request)
       end
 
       def endpoint
