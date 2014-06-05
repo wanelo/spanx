@@ -24,7 +24,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'webmachine'
 
-  gem.add_development_dependency 'rspec', '~> 2.14'
+  gem.add_development_dependency 'rspec', '~> 2.99'
   gem.add_development_dependency 'fakeredis'
   gem.add_development_dependency 'timecop'
   gem.add_development_dependency 'webmock'
