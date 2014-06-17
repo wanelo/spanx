@@ -23,15 +23,4 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'mail', '~> 2.4.4'
 
   gem.add_dependency 'webmachine'
-
-  gem.add_development_dependency 'rspec', '~> 2.14'
-  gem.add_development_dependency 'fakeredis'
-  gem.add_development_dependency 'timecop'
-  gem.add_development_dependency 'webmock'
-
-  gem.add_development_dependency 'guard-rspec'
-  gem.add_development_dependency 'rb-fsevent'
-
-  gem.add_development_dependency 'webmachine-test'
-
 end
