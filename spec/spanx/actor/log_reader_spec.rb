@@ -33,16 +33,16 @@ describe Spanx::Actor::LogReader do
     ip_hash.keys.size.should eql(expected_ip_count)
   end
 
-  let(:file_name) { "spec/fixtures/access.log.1" }
+  let(:file_name) { 'spec/fixtures/access.log.1' }
   let(:read_timeout) { 0.05 }
 
-  context "#read" do
-    it "should be able to read and parse IPs from a static file" do
+  context '#read' do
+    it 'should be able to read and parse IPs from a static file' do
       test_log_file(file_name, 82, 104)
     end
 
-    it "should be able to read and parse IPs from a file being appended to" do
-      tempfile = Tempfile.new("access.log")
+    it 'should be able to read and parse IPs from a file being appended to' do
+      tempfile = Tempfile.new('access.log')
 
       contents = ::File.read(file_name)
       tempfile.write(contents)
@@ -50,8 +50,8 @@ describe Spanx::Actor::LogReader do
 
       test_log_file(tempfile.path, 83, 105) do
         t_log_appender = Thread.new do
-          ::File.open(tempfile.path, "a") do |t|
-            t.write("9.9.9.9 - content")
+          ::File.open(tempfile.path, 'a') do |t|
+            t.write('9.9.9.9 - content')
           end
         end
         t_log_appender.join
@@ -59,10 +59,10 @@ describe Spanx::Actor::LogReader do
     end
   end
 
-  context "#whitelist" do
-    let(:whitelist_file) { "spec/fixtures/whitelist.txt" }
-    it "should exclude googlebot log lines" do
-      test_log_file("spec/fixtures/access.log.bots", 1, 1, Spanx::Whitelist.new(whitelist_file))
+  context '#whitelist' do
+    let(:whitelist_file) { 'spec/fixtures/whitelist.txt' }
+    it 'should exclude googlebot log lines' do
+      test_log_file('spec/fixtures/access.log.bots', 1, 1, Spanx::Whitelist.new(whitelist_file))
     end
   end
 end
