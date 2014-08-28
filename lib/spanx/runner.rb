@@ -68,7 +68,7 @@ module Spanx
     private
 
     def validate_args!(args)
-      raise("Invalid actor") unless (args - %w[collector log_reader writer analyzer]).empty?
+      raise('Invalid actor') unless (args - %w[collector log_reader writer analyzer]).empty?
     end
   end
 end

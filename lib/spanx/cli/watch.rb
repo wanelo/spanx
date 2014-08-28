@@ -42,9 +42,9 @@ class Spanx::CLI::Watch < Spanx::CLI
          :required => false
 
   option :daemonize,
-         :short => "-d",
-         :long => "--daemonize",
-         :description => "Detach from TTY and run as a daemon",
+         :short => '-d',
+         :long => '--daemonize',
+         :description => 'Detach from TTY and run as a daemon',
          :boolean => true,
          :default => false
 
@@ -64,9 +64,9 @@ class Spanx::CLI::Watch < Spanx::CLI
          :default => false
 
   option :help,
-         :short => "-h",
-         :long => "--help",
-         :description => "Show this message",
+         :short => '-h',
+         :long => '--help',
+         :description => 'Show this message',
          :on => :tail,
          :boolean => true,
          :show_options => true,
@@ -84,8 +84,8 @@ class Spanx::CLI::Watch < Spanx::CLI
   private
 
   def validate!
-    error_exit_with_msg("Could not find file. Use -f or set :file in config_file") unless config[:access_log] && File.exists?(config[:access_log])
-    error_exit_with_msg("-b block_file is required") unless config[:block_file]
+    error_exit_with_msg('Could not find file. Use -f or set :file in config_file') unless config[:access_log] && File.exists?(config[:access_log])
+    error_exit_with_msg('-b block_file is required') unless config[:block_file]
   end
 
 end

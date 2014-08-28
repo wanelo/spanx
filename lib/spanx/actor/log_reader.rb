@@ -15,7 +15,7 @@ module Spanx
 
       def run
         Thread.new do
-          Thread.current[:name] = "log_reader"
+          Thread.current[:name] = 'log_reader'
           Logger.log "tailing the log file #{file.path}...."
           self.read do |line|
             queue << [line, Time.now.to_i ] if line
