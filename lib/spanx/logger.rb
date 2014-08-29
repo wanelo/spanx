@@ -38,7 +38,7 @@ module Spanx
         end
         log "(#{"%9.2f" % (1000 * elapsed_time)}ms) #{message}"
         returned_from_block
-      rescue Exception => e
+      rescue StandardError => e
         elapsed_time = Time.now - start
         log "(#{"%9.2f" % (1000 * elapsed_time)}ms) error: #{e.message} for #{message} "
       end

@@ -11,9 +11,13 @@ class Spanx::CLI::Watch < Spanx::CLI
   EOF
 
   option :access_log,
-         :short => "-f ACCESS_LOG",
-         :long => "--file ACCESS_LOG",
-         :description => "Apache/nginx access log file to scan continuously",
+         :short => '-f ACCESS_LOG',
+         :long => '--file ACCESS_LOG',
+         :description => 'Apache/nginx access log file to scan continuously',
+         :proc => ->(f) {
+           options[:access_log] ||= []
+           options[:access_log] << f
+         },
          :required => false
 
   option :config_file,

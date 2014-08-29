@@ -3,34 +3,35 @@ require 'file-tail'
 module Spanx
   module Actor
     class LogReader
-      attr_accessor :file, :queue, :whitelist
+      attr_accessor :files, :queue, :whitelist, :threads
 
-      def initialize file, queue, interval = 1, whitelist = nil
-        @file = Spanx::Actor::File.new(file)
-        @file.interval = interval
-        @file.backward(0)
+      def initialize files, queue, interval = 1, whitelist = nil
+        @files = Array(files).map { |file| Spanx::Actor::File.new(file) }
+        @files.each do |file|
+          file.interval = interval
+          file.backward(0)
+        end
         @whitelist = whitelist
         @queue = queue
+        @threads = []
       end
 
       def run
-        Thread.new do
-          Thread.current[:name] = 'log_reader'
-          Logger.log "tailing the log file #{file.path}...."
-          self.read do |line|
-            queue << [line, Time.now.to_i ] if line
+        files.each_with_index do |file, i|
+          threads << Thread.new do
+            Thread.current[:name] = "log_reader.#{i}"
+            Logger.log "tailing the log file #{file.path}...."
+            self.read(file) do |line|
+              queue << [line, Time.now.to_i] if line
+            end
           end
         end
       end
 
-      def read &block
-        @file.tail do |line|
-          block.call(extract_ip(line)) unless whitelist && whitelist.match?(line)
+      def read file
+        file.tail do |line|
+          yield extract_ip(line) unless whitelist && whitelist.match?(line)
         end
-      end
-
-      def close
-        (@file.close if @file) rescue nil
       end
 
       def extract_ip line
