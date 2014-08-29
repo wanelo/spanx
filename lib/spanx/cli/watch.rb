@@ -13,10 +13,11 @@ class Spanx::CLI::Watch < Spanx::CLI
   option :access_log,
          :short => '-f ACCESS_LOG',
          :long => '--file ACCESS_LOG',
-         :description => 'Apache/nginx access log file to scan continuously',
+         :description => 'Apache/nginx access log file to scan continuously. Can be set multiple times.',
          :proc => ->(f) {
-           options[:access_log] ||= []
-           options[:access_log] << f
+           @watched_log_files ||= []
+           @watched_log_files << f
+           @watched_log_files.uniq!
          },
          :required => false
 
@@ -88,7 +89,7 @@ class Spanx::CLI::Watch < Spanx::CLI
   private
 
   def validate!
-    error_exit_with_msg('Could not find file. Use -f or set :file in config_file') unless config[:access_log] && File.exists?(config[:access_log])
+    error_exit_with_msg('Could not find file. Use -f or set :file in config_file') unless config[:access_log] && File.exist?(config[:access_log].first)
     error_exit_with_msg('-b block_file is required') unless config[:block_file]
   end
 
