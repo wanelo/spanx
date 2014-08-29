@@ -6,7 +6,7 @@ module Spanx
       attr_accessor :files, :queue, :whitelist, :threads
 
       def initialize files, queue, interval = 1, whitelist = nil
-        @files = Array(files).map { |file| Spanx::Actor::File.new(file) }
+        @files = Array(files).uniq.map { |file| Spanx::Actor::File.new(file) }
         @files.each do |file|
           file.interval = interval
           file.backward(0)
