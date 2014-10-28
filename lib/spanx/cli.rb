@@ -17,6 +17,7 @@ module Spanx
       Spanx::CLI.subclass_class(args.shift).new.run(args)
     end
 
+
     private
 
     def validate!

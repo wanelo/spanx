@@ -5,6 +5,12 @@ class Spanx::CLI::Flush < Spanx::CLI
 
   banner "Usage: spanx flush [options]"
 
+  option :ip,
+         :short => '-i IPADDRESS',
+         :long => '--ip IPADDRESS',
+         :description => 'Unblock specific IP instead of all',
+         :required => false
+
   option :config_file,
          :short => '-c CONFIG',
          :long => '--config CONFIG',
@@ -31,6 +37,13 @@ class Spanx::CLI::Flush < Spanx::CLI
 
   def run(argv = ARGV)
     generate_config(argv)
-    Spanx::IPChecker.unblock_all
+    keys = if config[:ip]
+      puts "unblocking ip #{config[:ip]}" if config[:debug]
+      Spanx::IPChecker.new(config[:ip]).unblock
+    else
+      puts "unblocking all IPs" if config[:debug]
+      Spanx::IPChecker.unblock_all
+    end
+    puts "deleted #{keys} IPs" if config[:debug]
   end
 end
