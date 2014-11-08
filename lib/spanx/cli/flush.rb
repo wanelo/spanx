@@ -37,13 +37,16 @@ class Spanx::CLI::Flush < Spanx::CLI
 
   def run(argv = ARGV)
     generate_config(argv)
+    out = ""
     keys = if config[:ip]
-      puts "unblocking ip #{config[:ip]}" if config[:debug]
+      out << "unblocking ip #{config[:ip]}: "
       Spanx::IPChecker.new(config[:ip]).unblock
     else
-      puts "unblocking all IPs" if config[:debug]
+      out << "unblocking all IPs: " if config[:debug]
       Spanx::IPChecker.unblock_all
     end
-    puts "deleted #{keys} IPs" if config[:debug]
+    out << "deleted #{keys} IPs that matched"
+    puts out if config[:debug]
+    out
   end
 end

@@ -15,12 +15,12 @@ Gem::Specification.new do |gem|
   gem.require_paths = %w(lib)
   gem.version       = Spanx::VERSION
 
-  gem.add_dependency 'pause', '~> 0.0.6'
+  gem.add_dependency 'pause'
   gem.add_dependency 'file-tail'
   gem.add_dependency 'mixlib-cli'
   gem.add_dependency 'daemons'
   gem.add_dependency 'tinder'
-  gem.add_dependency 'mail', '~> 2.4.4'
+  gem.add_dependency 'mail'
 
   gem.add_dependency 'webmachine'
 end
