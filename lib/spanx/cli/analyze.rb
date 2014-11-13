@@ -6,11 +6,12 @@ require 'spanx/runner'
 
 class Spanx::CLI::Analyze < Spanx::CLI
 
-  banner "Usage: spanx analyze [options]"
+  banner 'Usage: spanx analyze [options]'
+  description 'Analyze IP traffic and save blocked IPs into Redis'
 
   option :daemonize,
-         :short => "-d",
-         :long => "--daemonize",
+         :short => '-d',
+         :long => '--daemonize',
          :boolean => true,
          :default => false
 
@@ -35,9 +36,9 @@ class Spanx::CLI::Analyze < Spanx::CLI
          :required => false
 
   option :help,
-         :short => "-h",
-         :long => "--help",
-         :description => "Show this message",
+         :short => '-h',
+         :long => '--help',
+         :description => 'Show this message',
          :on => :tail,
          :boolean => true,
          :show_options => true,

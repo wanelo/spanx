@@ -6,11 +6,12 @@ require 'spanx/api/machine'
 
 class Spanx::CLI::Api < Spanx::CLI
 
-  banner "Usage: spanx api [options]"
+  banner 'Usage: spanx api [options]'
+  description 'Start HTTP server for controlling Spanx (experimental)'
 
   option :daemonize,
-         :short => "-d",
-         :long => "--daemonize",
+         :short => '-d',
+         :long => '--daemonize',
          :boolean => true,
          :default => false
 

@@ -1,9 +1,13 @@
 module Spanx
-  USAGE = %q{Usage: spanx command [options]
-  watch   -- Watch a server log file and write out a block list file
-  analyze -- Analyze IP traffic and save blocked IPs into Redis
-  flush   -- Remove all IP blocks and delete previous tracking of that IP
-  disable -- Disable IP blocking
-  enable  -- Enable IP blocking if disabled
-}
+  class Usage
+    HEADER = %q{Usage: spanx [ --help | <command> ]  [options]}
+
+    def self.usage
+      out = ''
+      out << HEADER + "\n\n"
+      Spanx::CLI.subclasses.each_pair{|command, clazz| out << "#{sprintf "%10s", command}\t#{clazz.description}\n"}
+      out << "\nRun 'spanx <command> --help' to see command-specific options.\n"
+      out
+    end
+  end
 end

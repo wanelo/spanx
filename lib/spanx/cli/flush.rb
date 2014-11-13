@@ -3,12 +3,19 @@ require 'spanx/logger'
 
 class Spanx::CLI::Flush < Spanx::CLI
 
-  banner "Usage: spanx flush [options]"
+  banner 'Usage: spanx flush [options]'
+  description 'Remove a specific IP block, or all blocked IPs'
 
   option :ip,
          :short => '-i IPADDRESS',
          :long => '--ip IPADDRESS',
-         :description => 'Unblock specific IP instead of all',
+         :description => 'Unblock specific IP',
+         :required => false
+
+  option :all,
+         :short => '-a',
+         :long => '--all',
+         :description => 'Unblock all IPs',
          :required => false
 
   option :config_file,
@@ -37,13 +44,15 @@ class Spanx::CLI::Flush < Spanx::CLI
 
   def run(argv = ARGV)
     generate_config(argv)
-    out = ""
-    keys = if config[:ip]
+    out = ''
+    keys = if config[:ip] =~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/
       out << "unblocking ip #{config[:ip]}: "
       Spanx::IPChecker.new(config[:ip]).unblock
-    else
-      out << "unblocking all IPs: " if config[:debug]
+    elsif config[:all]
+      out << 'unblocking all IPs: ' if config[:debug]
       Spanx::IPChecker.unblock_all
+    else
+      error_exit_with_msg 'Either -i or -a flag is required now'
     end
     out << "deleted #{keys} IPs that matched"
     puts out if config[:debug]

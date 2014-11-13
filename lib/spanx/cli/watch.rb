@@ -10,6 +10,8 @@ class Spanx::CLI::Watch < Spanx::CLI
   Usage: spanx watch [options]
   EOF
 
+  description 'Watch a server log file and write out a block list file'
+
   option :access_log,
          :short => '-f ACCESS_LOG',
          :long => '--file ACCESS_LOG',

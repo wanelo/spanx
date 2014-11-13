@@ -3,7 +3,8 @@ require 'spanx/logger'
 
 class Spanx::CLI::Enable < Spanx::CLI
 
-  banner "Usage: spanx enable [options]"
+  banner 'Usage: spanx enable [options]'
+  description 'Enable IP Blocking, if disabled'
 
   option :config_file,
          :short => '-c CONFIG',

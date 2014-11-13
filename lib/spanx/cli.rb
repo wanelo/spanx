@@ -17,13 +17,17 @@ module Spanx
       Spanx::CLI.subclass_class(args.shift).new.run(args)
     end
 
-
     private
 
     def validate!
-      error_exit_with_msg("No command given") if args.empty?
+      error_exit_with_msg('No command given') if args.empty?
       @command = args.first
-      error_exit_with_msg("No command found matching #{@command}") unless Spanx::CLI.subclasses.include?(@command)
+      if !@command.eql?('-h') && !@command.eql?('--help')
+        error_exit_with_msg("No command found matching #{@command}") unless Spanx::CLI.subclasses.include?(@command)
+      else
+        help_exit
+      end
+
     end
 
     def generate_config(argv)
@@ -36,14 +40,13 @@ module Spanx
       end
 
       Spanx::Logger.enable if config[:debug]
+    rescue OptionParser::InvalidOption => e
+      error_exit_with_msg "Whoops, #{e.message}"
     end
 
   end
 end
 
-require 'spanx/cli/watch'
-require 'spanx/cli/analyze'
-require 'spanx/cli/disable'
-require 'spanx/cli/enable'
-require 'spanx/cli/flush'
-require 'spanx/cli/api'
+Dir.glob("#{File.expand_path('../cli', __FILE__)}/*.rb").each do |file|
+  require file
+end

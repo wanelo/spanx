@@ -24,6 +24,15 @@ module Spanx
 
         def inherited(subclass)
           subclasses[subclass.subclass_name] = subclass
+          subclass.instance_eval do
+            @description = nil
+            class << self
+              def description value = nil
+                @description ||= value
+                @description
+              end
+            end
+          end
         end
       end
     end
