@@ -3,7 +3,7 @@ require 'spanx/logger'
 
 class Spanx::CLI::Flush < Spanx::CLI
 
-  banner 'Usage: spanx flush [options]'
+  banner 'Usage: spanx flush [ -a | -i IPADDRESS ] [options]'
   description 'Remove a specific IP block, or all blocked IPs'
 
   option :ip,

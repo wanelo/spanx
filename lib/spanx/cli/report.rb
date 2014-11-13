@@ -3,7 +3,7 @@ require 'spanx/logger'
 
 class Spanx::CLI::Report < Spanx::CLI
 
-  banner 'Usage: spanx report [options]'
+  banner 'Usage: spanx report [ -b | -t ] [options]'
   description 'Report on tracked and/or blocked IPs'
 
   option :blocked,
