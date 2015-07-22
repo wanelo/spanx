@@ -9,8 +9,10 @@ describe Spanx::Notifier::Base do
     let(:blocked_action) { Pause::RateLimitedEvent.new(ip_check, period_check, 500, time.to_i)}
 
     it "should set the correct message content" do
-      Spanx::Notifier::Base.new.send(:generate_block_ip_message, blocked_action).should ==
-          "1.2.3.4 blocked @ #{time} for 1mins, for 500 requests over 1mins, with 100 allowed."
+      notifier = Spanx::Notifier::Base.new
+      expect(notifier).to receive(:host).with("1.2.3.4"){ "1.2.3.4.in-addr.arpa domain name pointer crawl-66-249-66-1.googlebot.com." }
+      notifier.send(:generate_block_ip_message, blocked_action).should ==
+          "1.2.3.4 blocked @ #{time} for 1mins, for 500 requests over 1mins, with 100 allowed. Host: 1.2.3.4.in-addr.arpa domain name pointer crawl-66-249-66-1.googlebot.com."
     end
   end
 end
