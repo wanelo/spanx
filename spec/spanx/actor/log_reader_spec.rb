@@ -16,6 +16,7 @@ describe Spanx::Actor::LogReader do
   describe '#read' do
     let(:tempfile) { Tempfile.new('access.log') }
     let!(:file) { Spanx::Actor::File.new(tempfile.path) }
+    let(:files) { [ file ] }
 
     it 'yields each ip in a file as it is written' do
       expect { |b|
