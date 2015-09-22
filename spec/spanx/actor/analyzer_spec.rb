@@ -6,7 +6,7 @@ describe Spanx::Actor::Analyzer do
   include Spanx::Helper::Timing
 
   before do
-    pause_config = double(resolution: 10, history: 100, redis_host: "1.2.3.4", redis_port: 1, redis_db: 1)
+    pause_config = double(resolution: 10, history: 100, redis_host: "1.2.3.4", redis_port: 1, redis_db: 1, sharded: false)
     Pause.stub(:config).and_return(pause_config)
     pause_analyzer = Pause::Analyzer.new
     Pause.stub(:analyzer).and_return(pause_analyzer)
