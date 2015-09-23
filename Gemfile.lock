@@ -6,7 +6,7 @@ PATH
       file-tail
       mail
       mixlib-cli
-      pause
+      pause (>= 0.1.0)
       tinder
       webmachine
 
