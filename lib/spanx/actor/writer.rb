@@ -16,7 +16,7 @@ module Spanx
 
       def run
         Thread.new do
-          Thread.current[:name] = "writer"
+          Thread.current[:name] = 'writer'
           loop do
             self.write
             sleep config[:writer][:write_interval]
@@ -28,7 +28,7 @@ module Spanx
         if Spanx::IPChecker.enabled?
           ips = Spanx::IPChecker.rate_limited_identifiers
         else
-          Logger.log "writing empty block file due to disabled state"
+          Logger.log 'writing empty block file due to disabled state'
           ips = []
         end
 
@@ -56,9 +56,9 @@ module Spanx
       def run_command
         result = system(@run_command)
         if result
-          "executed successfully"
+          'executed successfully'
         elsif result == false
-          "returned non-zero exit status"
+          'returned non-zero exit status'
         elsif result.nil?
           "failed -- #{$?}"
         end

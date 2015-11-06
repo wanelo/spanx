@@ -3,14 +3,14 @@ require 'spec_helper'
 describe Spanx::Notifier::Slack do
   subject { Spanx::Notifier::Slack.new(config) }
 
-    describe "#enabled?" do
-      context "with no slack configuration" do
+    describe '#enabled?' do
+      context 'with no slack configuration' do
         let(:config) { {} }
 
         it { should_not be_enabled }
       end
 
-      context "with enabled slack configuration" do
+      context 'with enabled slack configuration' do
         let(:config) { {slack: {enabled: true}} }
 
         it { should be_enabled }
@@ -36,11 +36,11 @@ describe Spanx::Notifier::Slack do
 
     end
 
-    describe "#publish" do
+    describe '#publish' do
         let(:blocked_ip) { double }
         let(:blocked_ip_message) { 'shenanigans' }
         let!(:stubbed_request) {
-            stub_request(:post, "https://wanelo.slack.com/services/hooks/incoming-webhook?token=shipoopi").
+            stub_request(:post, 'https://wanelo.slack.com/services/hooks/incoming-webhook?token=shipoopi').
                 with(:body => "{\"text\":\"#{blocked_ip_message}\"}")
         }
 

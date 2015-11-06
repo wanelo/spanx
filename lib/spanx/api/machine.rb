@@ -8,12 +8,12 @@ module Spanx
     Machine = Webmachine::Application.new do |app|
       app.routes do
         # DELETE /ips/blocked/127.0.0.1
-        add ["ips", "blocked", :ip],
-            ->(req) { req.method == "DELETE" },
+        add ['ips', 'blocked', :ip],
+            ->(req) { req.method == 'DELETE' },
             Resources::UnblockIP
 
         # GET /ips/blocked
-        add ["ips", "blocked"], Resources::BlockedIps
+        add %w(ips blocked), Resources::BlockedIps
      end
     end
   end

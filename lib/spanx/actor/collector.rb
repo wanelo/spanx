@@ -18,7 +18,7 @@ module Spanx
 
       def run
         Thread.new do
-          Thread.current[:name] = "collector:queue"
+          Thread.current[:name] = 'collector:queue'
           loop do
             unless queue.empty?
               Logger.logging "caching [#{queue.size}] keys locally" do
@@ -34,7 +34,7 @@ module Spanx
         end
 
         Thread.new do
-          Thread.current[:name] = "collector:flush"
+          Thread.current[:name] = 'collector:flush'
           loop do
             semaphore.synchronize {
               Logger.logging "flushing cache with [#{cache.keys.size}] keys" do

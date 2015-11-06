@@ -33,9 +33,9 @@ class Spanx::CLI::Flush < Spanx::CLI
          :default => false
 
   option :help,
-         :short => "-h",
-         :long => "--help",
-         :description => "Show this message",
+         :short => '-h',
+         :long => '--help',
+         :description => 'Show this message',
          :on => :tail,
          :boolean => true,
          :show_options => true,

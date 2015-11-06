@@ -25,8 +25,8 @@ module Spanx
 
       def run
         Thread.new do
-          Thread.current[:name] = "analyzer"
-          Logger.log "starting analyzer loop..."
+          Thread.current[:name] = 'analyzer'
+          Logger.log 'starting analyzer loop...'
           loop do
             analyze_all_ips()
             sleep config[:analyzer][:analyze_interval]

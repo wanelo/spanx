@@ -39,14 +39,14 @@ class Spanx::CLI::Api < Spanx::CLI
   option :port,
          :short => '-p PORT',
          :long  => '--port PORT',
-         :description => "Port for the api to listen on.",
+         :description => 'Port for the api to listen on.',
          :default => 6060,
          :required => false
 
   option :help,
-         :short => "-h",
-         :long => "--help",
-         :description => "Show this message",
+         :short => '-h',
+         :long => '--help',
+         :description => 'Show this message',
          :on => :tail,
          :boolean => true,
          :show_options => true,

@@ -16,7 +16,7 @@ module Spanx
         return unless enabled?
 
         @thread = Thread.new do
-          Thread.current[:name] = "email notifier"
+          Thread.current[:name] = 'email notifier'
           Logger.log "sending notification email for #{blocked_ip.identifier}"
 
           mail = Mail.new

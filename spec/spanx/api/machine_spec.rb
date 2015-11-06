@@ -7,18 +7,18 @@ describe Spanx::API::Machine do
   let(:app) { Spanx::API::Machine }
   let(:json) { JSON.parse(response.body) }
 
-  describe "GET /ips/blocked" do
+  describe 'GET /ips/blocked' do
     it 'returns a list of ips that have been blocked' do
-      Spanx::IPChecker.stub(:rate_limited_identifiers).and_return(["127.0.0.1", "123.45.34.1"])
+      Spanx::IPChecker.stub(:rate_limited_identifiers).and_return(%w(127.0.0.1 123.45.34.1))
 
       get '/ips/blocked'
       expect(response.code).to eq(200)
 
-      expect(json).to eq(["127.0.0.1", "123.45.34.1"])
+      expect(json).to eq(%w(127.0.0.1 123.45.34.1))
     end
   end
 
-  describe "DELETE /ips/blocked/:ip" do
+  describe 'DELETE /ips/blocked/:ip' do
     it 'unblocks the specified ip' do
       mock_ip_checker = double
       mock_ip_checker.should_receive(:unblock).once

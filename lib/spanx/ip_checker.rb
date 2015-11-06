@@ -1,5 +1,5 @@
 require 'pause'
 
 class Spanx::IPChecker < Pause::Action
-  scope "ip"
+  scope 'ip'
 end

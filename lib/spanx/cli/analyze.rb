@@ -46,6 +46,6 @@ class Spanx::CLI::Analyze < Spanx::CLI
 
   def run(argv = ARGV)
     generate_config(argv)
-    Spanx::Runner.new("analyzer", config).run
+    Spanx::Runner.new('analyzer', config).run
   end
 end

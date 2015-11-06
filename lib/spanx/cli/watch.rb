@@ -83,7 +83,7 @@ class Spanx::CLI::Watch < Spanx::CLI
     generate_config(argv)
     validate!
     runners = %w(log_reader collector writer)
-    runners << "analyzer" if config[:analyze]
+    runners << 'analyzer' if config[:analyze]
 
     Spanx::Runner.new(*runners, config).run
   end
