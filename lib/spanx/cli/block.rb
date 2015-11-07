@@ -1,7 +1,7 @@
 require 'mixlib/cli'
 require 'spanx/logger'
 
-class Spanx::CLI::Flush < Spanx::CLI
+class Spanx::CLI::Block < Spanx::CLI
 
   banner 'Usage: spanx block [ -i IPADDRESS | -t SECONDS ] [options]'
   description 'Remove a specific IP block, or all blocked IPs'
