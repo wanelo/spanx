@@ -6,7 +6,7 @@ PATH
       file-tail
       mail
       mixlib-cli
-      pause (>= 0.2.0)
+      pause (>= 0.2.1)
       tinder
       webmachine
 
@@ -64,7 +64,7 @@ GEM
     notiffany (0.0.8)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    pause (0.2.0)
+    pause (0.2.1)
       redis
     pry (0.10.1)
       coderay (~> 1.1.0)

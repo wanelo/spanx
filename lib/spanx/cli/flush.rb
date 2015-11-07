@@ -45,16 +45,18 @@ class Spanx::CLI::Flush < Spanx::CLI
   def run(argv = ARGV)
     generate_config(argv)
     out = ''
-    keys = if config[:ip] =~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/
+    count = 0
+    if config[:ip] =~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/
+      count += 1
       out << "unblocking ip #{config[:ip]}: "
       Spanx::IPChecker.new(config[:ip]).unblock
     elsif config[:all]
       out << 'unblocking all IPs: ' if config[:debug]
-      Spanx::IPChecker.unblock_all
+      count += Spanx::IPChecker.unblock_all
     else
       error_exit_with_msg 'Either -i or -a flag is required now'
     end
-    out << "deleted #{keys} IPs that matched"
+    out << "deleted #{count} IPs that matched"
     puts out if config[:debug]
     out
   end
