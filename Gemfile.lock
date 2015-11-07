@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    spanx (0.3.0)
+    spanx (0.4.0)
       daemons
       file-tail
       mail
